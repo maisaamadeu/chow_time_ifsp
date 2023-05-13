@@ -6,6 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class FirebaseServices {
+  UserModel? user;
+  QuerySnapshot? allMenus;
+  QueryDocumentSnapshot? currentMenu;
+
   Future<void> initFirebase() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp(
