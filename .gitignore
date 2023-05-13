@@ -44,5 +44,5 @@ app.*.map.json
 /android/app/release
 
 # IOS
-ios/Runner
-macos/Runner
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
