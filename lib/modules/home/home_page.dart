@@ -1,13 +1,17 @@
+import 'package:chow_time_ifsp/modules/edit/edit_page.dart';
 import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
 import 'package:chow_time_ifsp/shared/themes/app_colors.dart';
 import 'package:chow_time_ifsp/shared/themes/app_images.dart';
 import 'package:chow_time_ifsp/shared/themes/app_text_styles.dart';
 import 'package:chow_time_ifsp/shared/widgets/chow_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.firebaseServices});
+
   final FirebaseServices firebaseServices;
 
   @override
@@ -79,11 +83,17 @@ class _HomePageState extends State<HomePage> {
                                 return const Text('Erro ao carregar o menu.');
                               } else {
                                 if (snapshot.data!) {
+                                  String currentMenuID =
+                                      widget.firebaseServices.currentMenu!.id;
                                   List<dynamic> currentMenu = (widget
                                       .firebaseServices.currentMenu!
                                       .data() as Map)['menu_days'];
                                   List<dynamic> currentMenuDays =
                                       widget.firebaseServices.currentMenuDays;
+
+                                  print((widget.firebaseServices.currentMenu!
+                                      .data()
+                                      .runtimeType));
 
                                   if (widget.firebaseServices.user!.userType ==
                                       'student') {
@@ -105,14 +115,21 @@ class _HomePageState extends State<HomePage> {
                                               ['salad'],
                                           onPressed: () {
                                             print('Estou funcionando');
-                                          }, index: index,
+                                          },
+                                          index: index,
+                                          date: DateFormat('dd/MM/yyyy').format(
+                                              (currentMenuDays[index]['date']
+                                                      as Timestamp)
+                                                  .toDate()),
+                                          id: currentMenuID,
                                         ),
                                       ),
                                     );
                                   } else {
                                     return Expanded(
-                                      child: ListView.builder(  physics:
-                                      const AlwaysScrollableScrollPhysics(),
+                                      child: ListView.builder(
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
                                         itemCount: currentMenu.length,
                                         padding: const EdgeInsets.all(0),
                                         shrinkWrap: true,
@@ -124,8 +141,30 @@ class _HomePageState extends State<HomePage> {
                                               ['main_course'],
                                           salad: currentMenu[index]['salad'],
                                           onPressed: () {
-                                            print('Estou funcionando');
-                                          },index: index,
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) => EditPage(
+                                                  id: currentMenuID,
+                                                  fruit: currentMenu[index]
+                                                      ['fruit'],
+                                                  mainCourse: currentMenu[index]
+                                                      ['main_course'],
+                                                  salad: currentMenu[index]
+                                                      ['salad'],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          index: index,
+                                          date: DateFormat('dd/MM/yyyy').format(
+                                              (currentMenu[index]['date']
+                                                      as Timestamp)
+                                                  .toDate()),
+                                          students: (currentMenu[index]
+                                                  ['students'] as List<dynamic>)
+                                              .length
+                                              .toString(),
+                                          id: currentMenuID,
                                         ),
                                       ),
                                     );

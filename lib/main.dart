@@ -9,7 +9,7 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (context) => MenusRepository(),
-      child: AppWidget(),
+      child: const AppWidget(),
     ),
   );
 }

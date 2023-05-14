@@ -9,6 +9,7 @@ class FirebaseServices {
   UserModel? user;
   QuerySnapshot? allMenus;
   QueryDocumentSnapshot? currentMenu;
+  List<dynamic> currentMenuDays = [];
 
   Future<void> initFirebase() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,7 @@ class FirebaseServices {
         firstName: (querySnapshot.docs[0].data() as Map)['first_name'],
         lastName: (querySnapshot.docs[0].data() as Map)['last_name'],
         registration: (querySnapshot.docs[0].data() as Map)['registration'],
+        userType: userType,
       );
 
       return true;
@@ -39,7 +41,7 @@ class FirebaseServices {
     return false;
   }
 
-  Future<void> getMenu() async {
+  Future<bool> getMenu() async {
     DateTime currentDate = DateTime.now();
     int weekDate = currentDate.weekday;
 
@@ -53,6 +55,16 @@ class FirebaseServices {
     allMenus = await FirebaseFirestore.instance.collection('menu').get();
 
     if (allMenus != null) {
+      if (weekDate > 5) {
+        startWeekTime =
+            startWeekTime.add(const Duration(days: 7)); //Não está adicionando
+        endWeekTime =
+            endWeekTime.add(const Duration(days: 7)); //Não está adicionado
+        formattedStartWeekTime = DateFormat('dd/MM/yyyy').format(startWeekTime);
+        formattedEndWeekTime = DateFormat('dd/MM/yyyy').format(endWeekTime);
+        weekDate = 1;
+      }
+
       for (var menu in allMenus!.docs) {
         String formattedStartOfTheWeekInMenu = DateFormat('dd/MM/yyyy').format(
             ((menu.data() as Map)['start_of_the_week'] as Timestamp).toDate());
@@ -62,8 +74,27 @@ class FirebaseServices {
         if (formattedStartOfTheWeekInMenu == formattedStartWeekTime &&
             formatedEndOfTheWeekInMenu == formattedEndWeekTime) {
           currentMenu = menu;
+
+          if (currentMenuDays != []) {
+            currentMenuDays.clear();
+          }
+
+          currentMenuDays
+              .add((currentMenu!.data() as Map)['menu_days'][weekDate]);
+
+          if (weekDate + 1 < 6) {
+            currentMenuDays
+                .add((currentMenu!.data() as Map)['menu_days'][weekDate + 1]);
+          }
+
+          if (currentMenuDays.isEmpty) {
+            return false;
+          }
+
+          return true;
         }
       }
     }
+    return false;
   }
 }
