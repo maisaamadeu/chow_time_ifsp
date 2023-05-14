@@ -1,5 +1,5 @@
 import 'package:chow_time_ifsp/modules/home/home_employee.dart';
-import 'package:chow_time_ifsp/modules/home/home_students.dart';
+import 'package:chow_time_ifsp/modules/home/home_page.dart';
 import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
 import 'package:chow_time_ifsp/shared/themes/app_colors.dart';
 import 'package:chow_time_ifsp/shared/themes/app_images.dart';
@@ -105,16 +105,14 @@ class _LoginPageState extends State<LoginPage> {
                               registration: controller.text);
 
                           if (response && context.mounted) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => _userType == 'student'
-                                    ? HomeStudents(
-                                        firebaseServices: firebaseServices,
-                                      )
-                                    : const HomeEmployee(),
-                              ),
-                            );
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomePage(
+                                          firebaseServices: firebaseServices,
+                                        ),
+
+                                ),);
                           } else {
                             showDialog(
                               context: context,
