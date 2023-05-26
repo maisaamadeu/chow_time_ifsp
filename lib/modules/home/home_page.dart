@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> {
                                           Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              DeleteMenusPage(),
+                                              const DeleteMenusPage(),
                                         ),
                                       ),
                                       child: const Row(
@@ -138,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                                       .data() as Map)['menu_days'];
 
                                   return isReloading
-                                      ? Center(
+                                      ? const Center(
                                           child: CircularProgressIndicator(),
                                         )
                                       : Expanded(
@@ -177,8 +177,6 @@ class _HomePageState extends State<HomePage> {
                                                               documentID:
                                                                   currentMenuID,
                                                               callback: () {
-                                                                print(
-                                                                    'object0');
                                                                 setState(() {
                                                                   isReloading =
                                                                       true;

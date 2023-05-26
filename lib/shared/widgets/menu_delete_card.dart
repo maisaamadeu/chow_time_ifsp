@@ -7,7 +7,8 @@ class MenuDeleteCard extends StatefulWidget {
   final Timestamp endOfTheWeek;
   final Function() onChanged;
 
-  MenuDeleteCard({
+  const MenuDeleteCard({
+    super.key,
     required this.startOfTheWeek,
     required this.endOfTheWeek,
     required this.onChanged,

@@ -186,7 +186,5 @@ class _DeleteMenusPageState extends State<DeleteMenusPage> {
     } else {
       deleteMenus.add(doc);
     }
-
-    print(deleteMenus);
   }
 }

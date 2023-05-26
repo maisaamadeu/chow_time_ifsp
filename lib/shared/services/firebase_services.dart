@@ -134,8 +134,7 @@ class FirebaseServices {
         }
       });
     } catch (e) {
-      // Trate qualquer erro de transação aqui
-      print('Erro na transação: $e');
+      debugPrint('Erro na transação: $e');
     }
   }
 
@@ -158,17 +157,18 @@ class FirebaseServices {
       DateTime endOfTheWeek =
           (documents.last['end_of_the_week'] as Timestamp).toDate();
 
-      DateTime newStartOfTheWeek = startOfTheWeek.add(Duration(days: 7));
-      DateTime newEndOfTheWeek = endOfTheWeek.add(Duration(days: 7));
+      DateTime newStartOfTheWeek = startOfTheWeek.add(const Duration(days: 7));
+      DateTime newEndOfTheWeek = endOfTheWeek.add(const Duration(days: 7));
 
       while (newStartOfTheWeek.isBefore(newEndOfTheWeek) ||
           newStartOfTheWeek.isAtSameMomentAs(newEndOfTheWeek)) {
         datesList.add(newStartOfTheWeek);
-        newStartOfTheWeek = newStartOfTheWeek.add(Duration(days: 1));
+        newStartOfTheWeek = newStartOfTheWeek.add(const Duration(days: 1));
       }
 
       final newWeek = {
-        'start_of_the_week': newStartOfTheWeek.subtract(Duration(days: 5)),
+        'start_of_the_week':
+            newStartOfTheWeek.subtract(const Duration(days: 5)),
         'end_of_the_week': newEndOfTheWeek,
         'menu_days': [
           {

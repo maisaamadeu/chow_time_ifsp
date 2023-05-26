@@ -108,19 +108,48 @@ class _EditPageState extends State<EditPage> {
                     Row(
                       children: [
                         Expanded(
-                          child: LabelButton(
-                            labelText: 'Salvar',
-                            onPressed: () async {
-                              await firebaseServices.editMenu(
-                                  documentID: widget.id,
-                                  index: widget.index,
-                                  fruit: fruitController.text,
-                                  mainCourse: mainCourseController.text,
-                                  salad: saladController.text);
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
+                            child: LabelButton(
+                          labelText: 'Salvar',
+                          onPressed: () async {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Tem certeza?'),
+                                    content: const Text(
+                                        'Lembre-se, não é possível voltar atrás dessa decisão.'),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text(
+                                          'Cancelar',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child:
+                                            const Text('Sim, tenho certeza!'),
+                                        onPressed: () async {
+                                          await firebaseServices.editMenu(
+                                              documentID: widget.id,
+                                              index: widget.index,
+                                              fruit: fruitController.text,
+                                              mainCourse:
+                                                  mainCourseController.text,
+                                              salad: saladController.text);
+                                          if (context.mounted) {
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                });
+                          },
+                        )),
                         const SizedBox(
                           width: 10,
                         ),
