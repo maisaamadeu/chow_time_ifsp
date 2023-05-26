@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                               builder: (context) => AlertDialog(
                                 title: const Text('Ops!'),
                                 content: const Text(
-                                  "Ocorreu um problema ao tentar realizar o login, pedimos perdão pelo o incoveniente. Por favor, tente novamente!",
+                                  "Prontuário não encontrado, por favor verifique se digitou corretamente e tente novamente!",
                                   textAlign: TextAlign.justify,
                                 ),
                                 actions: [

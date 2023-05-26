@@ -1,3 +1,4 @@
+import 'package:chow_time_ifsp/modules/delete%20menus/delete_menus_page.dart';
 import 'package:chow_time_ifsp/modules/edit/edit_page.dart';
 import 'package:chow_time_ifsp/modules/login/login_page.dart';
 import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
@@ -56,7 +57,7 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          height: MediaQuery.sizeOf(context).width * 0.1,
+                          height: MediaQuery.sizeOf(context).width * 0.15,
                           margin: const EdgeInsetsDirectional.only(top: 50),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -70,6 +71,38 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 icon: const Icon(Icons.exit_to_app),
                               ),
+                              widget.firebaseServices.user!.userType ==
+                                      'employee'
+                                  ? TextButton(
+                                      onPressed: () {
+                                        FirebaseServices().addWeek();
+                                      },
+                                      child: const Row(
+                                        children: [
+                                          Icon(Icons.add),
+                                          Text('Adicionar ')
+                                        ],
+                                      ),
+                                    )
+                                  : Container(),
+                              widget.firebaseServices.user!.userType ==
+                                      'employee'
+                                  ? TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DeleteMenusPage(),
+                                        ),
+                                      ),
+                                      child: const Row(
+                                        children: [
+                                          Icon(Icons.delete),
+                                          Text('Remover')
+                                        ],
+                                      ),
+                                    )
+                                  : Container(),
                             ],
                           ),
                         ),
@@ -134,21 +167,23 @@ class _HomePageState extends State<HomePage> {
                                                           .user!.userType ==
                                                       'student'
                                                   ? () async {
-                                                      await addOrRemoveStudent(
-                                                          index: index,
-                                                          registration: widget
-                                                              .firebaseServices
-                                                              .user!
-                                                              .registration,
-                                                          documentID:
-                                                              currentMenuID,
-                                                          callback: () {
-                                                            print('object0');
-                                                            setState(() {
-                                                              isReloading =
-                                                                  true;
-                                                            });
-                                                          });
+                                                      await FirebaseServices()
+                                                          .addOrRemoveStudent(
+                                                              index: index,
+                                                              registration: widget
+                                                                  .firebaseServices
+                                                                  .user!
+                                                                  .registration,
+                                                              documentID:
+                                                                  currentMenuID,
+                                                              callback: () {
+                                                                print(
+                                                                    'object0');
+                                                                setState(() {
+                                                                  isReloading =
+                                                                      true;
+                                                                });
+                                                              });
 
                                                       setState(() {
                                                         // Atualização do segundo estado após 1 segundo
