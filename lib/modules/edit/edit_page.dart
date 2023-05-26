@@ -9,11 +9,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class EditPage extends StatefulWidget {
   const EditPage(
-      {super.key, this.mainCourse, this.salad, this.fruit, required this.id});
+      {super.key,
+      this.mainCourse,
+      this.salad,
+      this.fruit,
+      required this.id,
+      required this.index});
 
   final String? mainCourse;
   final String? salad;
   final String? fruit;
+  final int index;
   final String id;
 
   @override
@@ -104,13 +110,27 @@ class _EditPageState extends State<EditPage> {
                         Expanded(
                           child: LabelButton(
                             labelText: 'Salvar',
-                            onPressed: () {},
+                            onPressed: () async {
+                              await firebaseServices.editMenu(
+                                  documentID: widget.id,
+                                  index: widget.index,
+                                  fruit: fruitController.text,
+                                  mainCourse: mainCourseController.text,
+                                  salad: saladController.text);
+                              Navigator.pop(context);
+                            },
                           ),
+                        ),
+                        const SizedBox(
+                          width: 10,
                         ),
                         Expanded(
                           child: LabelButton(
                             labelText: 'Cancelar',
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            color: AppColors.delete,
                           ),
                         ),
                       ],

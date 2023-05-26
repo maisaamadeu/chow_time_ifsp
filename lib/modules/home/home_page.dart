@@ -1,4 +1,5 @@
 import 'package:chow_time_ifsp/modules/edit/edit_page.dart';
+import 'package:chow_time_ifsp/modules/login/login_page.dart';
 import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
 import 'package:chow_time_ifsp/shared/themes/app_colors.dart';
 import 'package:chow_time_ifsp/shared/themes/app_images.dart';
@@ -19,12 +20,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool isReloading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Colors.transparent,
-      // ),
       body: RefreshIndicator(
         color: Colors.white,
         backgroundColor: AppColors.primary,
@@ -55,15 +55,30 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          height: MediaQuery.sizeOf(context).width * 0.2,
+                        Container(
+                          height: MediaQuery.sizeOf(context).width * 0.1,
+                          margin: const EdgeInsetsDirectional.only(top: 50),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginPage(),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.exit_to_app),
+                              ),
+                            ],
+                          ),
                         ),
                         Text(
                           'Seja bem-vindo(a) ${widget.firebaseServices.user!.firstName} ${widget.firebaseServices.user!.lastName}!',
                           style: AppTextStyles.titleHome,
                         ),
                         Text(
-                          'Selecione abaixo se irá comser ou não!',
+                          'Selecione abaixo se irá comer ou não!',
                           style: AppTextStyles.trailingRegular,
                         ),
                         const SizedBox(
@@ -88,87 +103,101 @@ class _HomePageState extends State<HomePage> {
                                   List<dynamic> currentMenu = (widget
                                       .firebaseServices.currentMenu!
                                       .data() as Map)['menu_days'];
-                                  List<dynamic> currentMenuDays =
-                                      widget.firebaseServices.currentMenuDays;
 
-                                  print((widget.firebaseServices.currentMenu!
-                                      .data()
-                                      .runtimeType));
+                                  return isReloading
+                                      ? Center(
+                                          child: CircularProgressIndicator(),
+                                        )
+                                      : Expanded(
+                                          child: ListView.builder(
+                                            physics:
+                                                const AlwaysScrollableScrollPhysics(),
+                                            itemCount: currentMenu.length,
+                                            padding: const EdgeInsets.all(0),
+                                            shrinkWrap: true,
+                                            itemBuilder: (context, index) =>
+                                                ChowCard(
+                                              isEmployee: widget
+                                                          .firebaseServices
+                                                          .user!
+                                                          .userType ==
+                                                      'student'
+                                                  ? false
+                                                  : true,
+                                              fruit: currentMenu[index]
+                                                  ['fruit'],
+                                              mainCourse: currentMenu[index]
+                                                  ['main_course'],
+                                              salad: currentMenu[index]
+                                                  ['salad'],
+                                              onPressed: widget.firebaseServices
+                                                          .user!.userType ==
+                                                      'student'
+                                                  ? () async {
+                                                      await addOrRemoveStudent(
+                                                          index: index,
+                                                          registration: widget
+                                                              .firebaseServices
+                                                              .user!
+                                                              .registration,
+                                                          documentID:
+                                                              currentMenuID,
+                                                          callback: () {
+                                                            print('object0');
+                                                            setState(() {
+                                                              isReloading =
+                                                                  true;
+                                                            });
+                                                          });
 
-                                  if (widget.firebaseServices.user!.userType ==
-                                      'student') {
-                                    return Expanded(
-                                      child: ListView.builder(
-                                        physics:
-                                            const AlwaysScrollableScrollPhysics(),
-                                        itemCount: currentMenuDays.length,
-                                        padding: const EdgeInsets.all(0),
-                                        shrinkWrap: true,
-                                        itemBuilder: (context, index) =>
-                                            ChowCard(
-                                          isEmployee: false,
-                                          fruit: currentMenuDays[index]
-                                              ['fruit'],
-                                          mainCourse: currentMenuDays[index]
-                                              ['main_course'],
-                                          salad: currentMenuDays[index]
-                                              ['salad'],
-                                          onPressed: () {
-                                            print('Estou funcionando');
-                                          },
-                                          index: index,
-                                          date: DateFormat('dd/MM/yyyy').format(
-                                              (currentMenuDays[index]['date']
-                                                      as Timestamp)
-                                                  .toDate()),
-                                          id: currentMenuID,
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    return Expanded(
-                                      child: ListView.builder(
-                                        physics:
-                                            const AlwaysScrollableScrollPhysics(),
-                                        itemCount: currentMenu.length,
-                                        padding: const EdgeInsets.all(0),
-                                        shrinkWrap: true,
-                                        itemBuilder: (context, index) =>
-                                            ChowCard(
-                                          isEmployee: true,
-                                          fruit: currentMenu[index]['fruit'],
-                                          mainCourse: currentMenu[index]
-                                              ['main_course'],
-                                          salad: currentMenu[index]['salad'],
-                                          onPressed: () {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (context) => EditPage(
-                                                  id: currentMenuID,
-                                                  fruit: currentMenu[index]
-                                                      ['fruit'],
-                                                  mainCourse: currentMenu[index]
-                                                      ['main_course'],
-                                                  salad: currentMenu[index]
-                                                      ['salad'],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          index: index,
-                                          date: DateFormat('dd/MM/yyyy').format(
-                                              (currentMenu[index]['date']
-                                                      as Timestamp)
-                                                  .toDate()),
-                                          students: (currentMenu[index]
-                                                  ['students'] as List<dynamic>)
-                                              .length
-                                              .toString(),
-                                          id: currentMenuID,
-                                        ),
-                                      ),
-                                    );
-                                  }
+                                                      setState(() {
+                                                        // Atualização do segundo estado após 1 segundo
+                                                        isReloading = false;
+                                                      });
+                                                    }
+                                                  : () {
+                                                      Navigator.of(context)
+                                                          .push(
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              EditPage(
+                                                            id: currentMenuID,
+                                                            fruit: currentMenu[
+                                                                index]['fruit'],
+                                                            mainCourse:
+                                                                currentMenu[
+                                                                        index][
+                                                                    'main_course'],
+                                                            salad: currentMenu[
+                                                                index]['salad'],
+                                                            index: index,
+                                                          ),
+                                                        ),
+                                                      );
+                                                      setState(() {});
+                                                    },
+                                              index: index,
+                                              date: DateFormat('dd/MM/yyyy')
+                                                  .format((currentMenu[index]
+                                                          ['date'] as Timestamp)
+                                                      .toDate()),
+                                              students: (currentMenu[index]
+                                                          ['students']
+                                                      as List<dynamic>)
+                                                  .length
+                                                  .toString(),
+                                              id: currentMenuID,
+                                              containsStudent:
+                                                  (currentMenu[index]
+                                                              ['students']
+                                                          as List<dynamic>)
+                                                      .contains(widget
+                                                          .firebaseServices
+                                                          .user!
+                                                          .registration),
+                                            ),
+                                          ),
+                                        );
                                 } else {
                                   return const Text('Menu não encontrado.');
                                 }

@@ -1,4 +1,3 @@
-import 'package:chow_time_ifsp/modules/home/home_employee.dart';
 import 'package:chow_time_ifsp/modules/home/home_page.dart';
 import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
 import 'package:chow_time_ifsp/shared/themes/app_colors.dart';
@@ -106,13 +105,13 @@ class _LoginPageState extends State<LoginPage> {
 
                           if (response && context.mounted) {
                             Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomePage(
-                                          firebaseServices: firebaseServices,
-                                        ),
-
-                                ),);
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(
+                                  firebaseServices: firebaseServices,
+                                ),
+                              ),
+                            );
                           } else {
                             showDialog(
                               context: context,

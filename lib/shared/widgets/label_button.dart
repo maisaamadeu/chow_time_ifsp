@@ -1,11 +1,16 @@
-import 'package:chow_time_ifsp/shared/themes/app_text_styles.dart';
+import 'package:chow_time_ifsp/shared/themes/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LabelButton extends StatefulWidget {
   const LabelButton(
-      {super.key, required this.labelText, required this.onPressed});
+      {super.key,
+      required this.labelText,
+      required this.onPressed,
+      this.color});
   final String labelText;
   final VoidCallback onPressed;
+  final dynamic color;
 
   @override
   State<LabelButton> createState() => _LabelButtonState();
@@ -31,7 +36,11 @@ class _LabelButtonState extends State<LabelButton> {
               )
             : Text(
                 widget.labelText,
-                style: AppTextStyles.buttonPrimary,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: widget.color ?? AppColors.primary,
+                ),
               ),
       ),
     );
