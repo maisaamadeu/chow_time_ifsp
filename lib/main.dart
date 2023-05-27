@@ -4,7 +4,7 @@ import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() async {
+void main() {
   FirebaseServices().initFirebase();
   runApp(
     ChangeNotifierProvider(

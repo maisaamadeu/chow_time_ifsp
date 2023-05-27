@@ -2,7 +2,6 @@ import 'package:chow_time_ifsp/modules/delete%20menus/delete_menus_page.dart';
 import 'package:chow_time_ifsp/modules/edit/edit_page.dart';
 import 'package:chow_time_ifsp/modules/login/login_page.dart';
 import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
-import 'package:chow_time_ifsp/shared/themes/app_colors.dart';
 import 'package:chow_time_ifsp/shared/themes/app_images.dart';
 import 'package:chow_time_ifsp/shared/themes/app_text_styles.dart';
 import 'package:chow_time_ifsp/shared/widgets/chow_card.dart';
@@ -22,16 +21,103 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isReloading = false;
+  DateTime dateSelected = DateTime.now();
+
+  bool checkDateExists(bool add) {
+    if (widget.firebaseServices.allMenus != null) {
+      DateTime customDateTest = dateSelected;
+      customDateTest = add
+          ? customDateTest.add(const Duration(days: 7))
+          : customDateTest.subtract(const Duration(days: 7));
+      int weekDateTest = customDateTest.weekday;
+
+      DateTime startWeekTimeTest =
+          customDateTest.subtract(Duration(days: weekDateTest - 1));
+      DateTime endWeekTimeTest = startWeekTimeTest.add(const Duration(days: 4));
+
+      String formattedStartWeekTime =
+          DateFormat('dd/MM/yyyy').format(startWeekTimeTest);
+      String formattedEndWeekTime =
+          DateFormat('dd/MM/yyyy').format(endWeekTimeTest);
+
+      if (weekDateTest > 5) {
+        startWeekTimeTest = startWeekTimeTest.add(const Duration(days: 7));
+        endWeekTimeTest = endWeekTimeTest.add(const Duration(days: 7));
+        formattedStartWeekTime =
+            DateFormat('dd/MM/yyyy').format(startWeekTimeTest);
+        formattedEndWeekTime = DateFormat('dd/MM/yyyy').format(endWeekTimeTest);
+        weekDateTest = 1;
+      }
+
+      for (QueryDocumentSnapshot menu
+          in widget.firebaseServices.allMenus!.docs) {
+        String formattedStartOfTheWeekInMenu = DateFormat('dd/MM/yyyy').format(
+            ((menu.data() as Map)['start_of_the_week'] as Timestamp).toDate());
+        String formatedEndOfTheWeekInMenu = DateFormat('dd/MM/yyyy').format(
+            ((menu.data() as Map)['end_of_the_week'] as Timestamp).toDate());
+
+        if (formattedStartOfTheWeekInMenu == formattedStartWeekTime &&
+            formatedEndOfTheWeekInMenu == formattedEndWeekTime) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
-        color: Colors.white,
-        backgroundColor: AppColors.primary,
-        onRefresh: () async {
-          return Future<void>.delayed(const Duration(seconds: 3));
-        },
+      appBar: AppBar(
+        actions: [
+          PopupMenuButton<String>(
+            itemBuilder: widget.firebaseServices.user!.userType == 'employee'
+                ? (context) => [
+                      const PopupMenuItem<String>(
+                        value: 'add',
+                        child: Text('Adicionar Semana'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'delete',
+                        child: Text('Apagar Semana'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'logout',
+                        child: Text('Sair'),
+                      ),
+                    ]
+                : (context) => [
+                      const PopupMenuItem<String>(
+                        value: 'logout',
+                        child: Text('Sair'),
+                      ),
+                    ],
+            onSelected: (value) {
+              switch (value) {
+                case 'add':
+                  FirebaseServices().addWeek();
+                  setState(() {});
+                  setState(() {});
+                  break;
+                case 'delete':
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => DeleteMenusPage(
+                      firebaseServices: widget.firebaseServices,
+                    ),
+                  ));
+                  break;
+                case 'logout':
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    (route) => false,
+                  );
+                  break;
+              }
+            },
+          )
+        ],
+      ),
+      body: SafeArea(
         child: SingleChildScrollView(
           child: SizedBox(
             height: MediaQuery.of(context).size.height,
@@ -52,193 +138,268 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 15,
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: MediaQuery.sizeOf(context).width * 0.15,
-                          margin: const EdgeInsetsDirectional.only(top: 50),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                onPressed: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginPage(),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.exit_to_app),
-                              ),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        width: 400,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Seja bem-vindo(a) ${widget.firebaseServices.user!.firstName} ${widget.firebaseServices.user!.lastName}!',
+                              style: AppTextStyles.titleHome,
+                            ),
+                            Text(
                               widget.firebaseServices.user!.userType ==
-                                      'employee'
-                                  ? TextButton(
-                                      onPressed: () {
-                                        FirebaseServices().addWeek();
-                                      },
-                                      child: const Row(
-                                        children: [
-                                          Icon(Icons.add),
-                                          Text('Adicionar ')
-                                        ],
-                                      ),
-                                    )
-                                  : Container(),
-                              widget.firebaseServices.user!.userType ==
-                                      'employee'
-                                  ? TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const DeleteMenusPage(),
-                                        ),
-                                      ),
-                                      child: const Row(
-                                        children: [
-                                          Icon(Icons.delete),
-                                          Text('Remover')
-                                        ],
-                                      ),
-                                    )
-                                  : Container(),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          'Seja bem-vindo(a) ${widget.firebaseServices.user!.firstName} ${widget.firebaseServices.user!.lastName}!',
-                          style: AppTextStyles.titleHome,
-                        ),
-                        Text(
-                          'Selecione abaixo se irá comer ou não!',
-                          style: AppTextStyles.trailingRegular,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        FutureBuilder<bool>(
-                          future: widget.firebaseServices.getMenu(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.waiting ||
-                                snapshot.connectionState ==
-                                    ConnectionState.none) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            } else {
-                              if (snapshot.hasError) {
-                                return const Text('Erro ao carregar o menu.');
-                              } else {
-                                if (snapshot.data!) {
-                                  String currentMenuID =
-                                      widget.firebaseServices.currentMenu!.id;
-                                  List<dynamic> currentMenu = (widget
-                                      .firebaseServices.currentMenu!
-                                      .data() as Map)['menu_days'];
+                                      'student'
+                                  ? 'Selecione abaixo se irá comer ou não!'
+                                  : 'Selecione abaixo qual dia gostaria de editar!',
+                              style: AppTextStyles.trailingRegular,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            FutureBuilder<bool>(
+                              future: widget.firebaseServices
+                                  .getMenu(customDate: dateSelected),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                        ConnectionState.waiting ||
+                                    snapshot.connectionState ==
+                                        ConnectionState.none) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                } else {
+                                  if (snapshot.hasError) {
+                                    return const Text(
+                                        'Erro ao carregar o menu.');
+                                  } else {
+                                    if (snapshot.data!) {
+                                      String currentMenuID = widget
+                                          .firebaseServices.currentMenu!.id;
+                                      List<dynamic> currentMenu = (widget
+                                          .firebaseServices.currentMenu!
+                                          .data() as Map)['menu_days'];
+                                      String startOfTheWeekFormatted =
+                                          DateFormat('dd/MM/yyyy').format(
+                                              ((widget.firebaseServices
+                                                              .currentMenu!
+                                                              .data() as Map)[
+                                                          'start_of_the_week']
+                                                      as Timestamp)
+                                                  .toDate());
+                                      String endOfTheWeekFormatted =
+                                          DateFormat('dd/MM/yyyy').format(
+                                              ((widget.firebaseServices
+                                                              .currentMenu!
+                                                              .data() as Map)[
+                                                          'end_of_the_week']
+                                                      as Timestamp)
+                                                  .toDate());
 
-                                  return isReloading
-                                      ? const Center(
-                                          child: CircularProgressIndicator(),
-                                        )
-                                      : Expanded(
-                                          child: ListView.builder(
-                                            physics:
-                                                const AlwaysScrollableScrollPhysics(),
-                                            itemCount: currentMenu.length,
-                                            padding: const EdgeInsets.all(0),
-                                            shrinkWrap: true,
-                                            itemBuilder: (context, index) =>
-                                                ChowCard(
-                                              isEmployee: widget
-                                                          .firebaseServices
-                                                          .user!
-                                                          .userType ==
-                                                      'student'
-                                                  ? false
-                                                  : true,
-                                              fruit: currentMenu[index]
-                                                  ['fruit'],
-                                              mainCourse: currentMenu[index]
-                                                  ['main_course'],
-                                              salad: currentMenu[index]
-                                                  ['salad'],
-                                              onPressed: widget.firebaseServices
-                                                          .user!.userType ==
-                                                      'student'
-                                                  ? () async {
-                                                      await FirebaseServices()
-                                                          .addOrRemoveStudent(
-                                                              index: index,
-                                                              registration: widget
-                                                                  .firebaseServices
-                                                                  .user!
-                                                                  .registration,
-                                                              documentID:
-                                                                  currentMenuID,
-                                                              callback: () {
+                                      return isReloading
+                                          ? const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            )
+                                          : Expanded(
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      widget.firebaseServices.user!
+                                                                  .userType ==
+                                                              'employee'
+                                                          ? IconButton(
+                                                              onPressed: () {
+                                                                bool result =
+                                                                    checkDateExists(
+                                                                        false);
+
+                                                                if (result) {
+                                                                  setState(() {
+                                                                    dateSelected =
+                                                                        dateSelected.subtract(const Duration(
+                                                                            days:
+                                                                                7));
+                                                                  });
+                                                                }
+                                                              },
+                                                              icon: const Icon(Icons
+                                                                  .arrow_back_ios_outlined),
+                                                            )
+                                                          : Container(),
+                                                      Text(
+                                                        '$startOfTheWeekFormatted - $endOfTheWeekFormatted',
+                                                        style: AppTextStyles
+                                                            .trailingRegular,
+                                                      ),
+                                                      widget.firebaseServices.user!
+                                                                  .userType ==
+                                                              'employee'
+                                                          ? IconButton(
+                                                              onPressed: () {
+                                                                bool result =
+                                                                    checkDateExists(
+                                                                        true);
+
+                                                                if (result) {
+                                                                  setState(() {
+                                                                    dateSelected =
+                                                                        dateSelected.add(const Duration(
+                                                                            days:
+                                                                                7));
+                                                                  });
+                                                                }
+                                                              },
+                                                              icon: const Icon(Icons
+                                                                  .arrow_forward_ios_outlined),
+                                                            )
+                                                          : Container(),
+                                                    ],
+                                                  ),
+                                                  Expanded(
+                                                    child: ListView.builder(
+                                                      itemCount:
+                                                          currentMenu.length,
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              0),
+                                                      itemBuilder:
+                                                          (context, index) =>
+                                                              ChowCard(
+                                                        isEmployee: widget
+                                                                    .firebaseServices
+                                                                    .user!
+                                                                    .userType ==
+                                                                'student'
+                                                            ? false
+                                                            : true,
+                                                        fruit:
+                                                            currentMenu[index]
+                                                                ['fruit'],
+                                                        mainCourse:
+                                                            currentMenu[index]
+                                                                ['main_course'],
+                                                        salad:
+                                                            currentMenu[index]
+                                                                ['salad'],
+                                                        onPressed: widget
+                                                                    .firebaseServices
+                                                                    .user!
+                                                                    .userType ==
+                                                                'student'
+                                                            ? () async {
+                                                                await FirebaseServices()
+                                                                    .addOrRemoveStudent(
+                                                                        index:
+                                                                            index,
+                                                                        registration: widget
+                                                                            .firebaseServices
+                                                                            .user!
+                                                                            .registration,
+                                                                        documentID:
+                                                                            currentMenuID,
+                                                                        callback:
+                                                                            () {
+                                                                          setState(
+                                                                              () {
+                                                                            isReloading =
+                                                                                true;
+                                                                          });
+                                                                        });
+
                                                                 setState(() {
                                                                   isReloading =
-                                                                      true;
+                                                                      false;
                                                                 });
-                                                              });
-
-                                                      setState(() {
-                                                        // Atualização do segundo estado após 1 segundo
-                                                        isReloading = false;
-                                                      });
-                                                    }
-                                                  : () {
-                                                      Navigator.of(context)
-                                                          .push(
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              EditPage(
-                                                            id: currentMenuID,
-                                                            fruit: currentMenu[
-                                                                index]['fruit'],
-                                                            mainCourse:
-                                                                currentMenu[
-                                                                        index][
-                                                                    'main_course'],
-                                                            salad: currentMenu[
-                                                                index]['salad'],
-                                                            index: index,
-                                                          ),
-                                                        ),
-                                                      );
-                                                      setState(() {});
-                                                    },
-                                              index: index,
-                                              date: DateFormat('dd/MM/yyyy')
-                                                  .format((currentMenu[index]
-                                                          ['date'] as Timestamp)
-                                                      .toDate()),
-                                              students: (currentMenu[index]
-                                                          ['students']
-                                                      as List<dynamic>)
-                                                  .length
-                                                  .toString(),
-                                              id: currentMenuID,
-                                              containsStudent:
-                                                  (currentMenu[index]
-                                                              ['students']
-                                                          as List<dynamic>)
-                                                      .contains(widget
-                                                          .firebaseServices
-                                                          .user!
-                                                          .registration),
+                                                              }
+                                                            : () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .push(
+                                                                  MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            EditPage(
+                                                                      id: currentMenuID,
+                                                                      fruit: currentMenu[
+                                                                              index]
+                                                                          [
+                                                                          'fruit'],
+                                                                      mainCourse:
+                                                                          currentMenu[index]
+                                                                              [
+                                                                              'main_course'],
+                                                                      salad: currentMenu[
+                                                                              index]
+                                                                          [
+                                                                          'salad'],
+                                                                      index:
+                                                                          index,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                                setState(() {});
+                                                              },
+                                                        index: index,
+                                                        date: DateFormat(
+                                                                'dd/MM/yyyy')
+                                                            .format((currentMenu[
+                                                                            index]
+                                                                        ['date']
+                                                                    as Timestamp)
+                                                                .toDate()),
+                                                        students: (currentMenu[
+                                                                        index]
+                                                                    ['students']
+                                                                as List<
+                                                                    dynamic>)
+                                                            .length
+                                                            .toString(),
+                                                        id: currentMenuID,
+                                                        containsStudent: (currentMenu[
+                                                                        index]
+                                                                    ['students']
+                                                                as List<
+                                                                    dynamic>)
+                                                            .contains(widget
+                                                                .firebaseServices
+                                                                .user!
+                                                                .registration),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                    } else {
+                                      return SizedBox(
+                                        width: 350,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'O menu selecionado não foi encontrado, tente reiniciar o aplicativo e caso o erro persista por favor consultar a equipe técnica.',
+                                              style:
+                                                  AppTextStyles.trailingRegular,
                                             ),
-                                          ),
-                                        );
-                                } else {
-                                  return const Text('Menu não encontrado.');
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                  }
                                 }
-                              }
-                            }
-                          },
+                              },
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),

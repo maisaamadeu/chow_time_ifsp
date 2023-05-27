@@ -1,3 +1,4 @@
+import 'package:chow_time_ifsp/modules/home/home_page.dart';
 import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
 import 'package:chow_time_ifsp/shared/themes/app_colors.dart';
 import 'package:chow_time_ifsp/shared/themes/app_images.dart';
@@ -9,7 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class DeleteMenusPage extends StatefulWidget {
-  const DeleteMenusPage({super.key});
+  const DeleteMenusPage({super.key, required this.firebaseServices});
+  final FirebaseServices firebaseServices;
 
   @override
   State<DeleteMenusPage> createState() => _DeleteMenusPageState();
@@ -153,7 +155,7 @@ class _DeleteMenusPageState extends State<DeleteMenusPage> {
                                                         .deleteMenuItems(
                                                             deleteMenus);
                                                     Navigator.pop(context);
-                                                    Navigator.pop(context);
+                                                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage(firebaseServices: widget.firebaseServices),),   (route) => false,);
                                                   },
                                                 ),
                                               ],

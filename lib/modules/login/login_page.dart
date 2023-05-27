@@ -25,134 +25,137 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Stack(
-          children: [
-            //Background
-            Positioned(
-              bottom: 0,
-              child: SvgPicture.asset(
-                AppImages.background,
-                semanticsLabel: 'Background Wave',
-              ),
+      body: Stack(
+        children: [
+          //Background
+          Positioned(
+            bottom: 0,
+            child: SvgPicture.asset(
+              AppImages.background,
+              semanticsLabel: 'Background Wave',
             ),
+          ),
 
-            //Elements of Page
-            Positioned.fill(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Insira os dados abaixo para realizar o login',
-                      style: AppTextStyles.titleRegular,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    InputData(
-                      controller: controller,
-                      labelText: 'Prontuário',
-                      hintText: 'Ex: BT000000',
-                      errorText: 'Este campo não pode ficar vazio!',
-                      isError: isError,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile(
-                            value: 'student',
-                            groupValue: _userType,
-                            onChanged: (value) => setState(
-                              () {
-                                _userType = value!;
-                              },
-                            ),
-                            contentPadding: const EdgeInsets.all(0),
-                            title: const Text('Estudante'),
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile(
-                            value: 'employee',
-                            groupValue: _userType,
-                            onChanged: (value) => setState(
-                              () {
-                                _userType = value!;
-                              },
-                            ),
-                            contentPadding: const EdgeInsets.all(0),
-                            title: const Text('Trabalhador'),
-                          ),
-                        ),
-                      ],
-                    ),
-                    LabelButton(
-                      labelText: 'Entrar',
-                      onPressed: () async {
-                        if (controller.text.isNotEmpty) {
-                          setState(() {
-                            isError = false;
-                          });
-                          bool response = await firebaseServices.login(
-                              userType: _userType,
-                              registration: controller.text);
-
-                          if (response && context.mounted) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(
-                                  firebaseServices: firebaseServices,
-                                ),
+          //Elements of Page
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 15,
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: 400,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Insira os dados abaixo para realizar o login',
+                        style: AppTextStyles.titleRegular,
+                        textAlign: TextAlign.start,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      InputData(
+                        controller: controller,
+                        labelText: 'Prontuário',
+                        hintText: 'Ex: BT000000',
+                        errorText: 'Este campo não pode ficar vazio!',
+                        isError: isError,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: RadioListTile(
+                              value: 'student',
+                              groupValue: _userType,
+                              onChanged: (value) => setState(
+                                () {
+                                  _userType = value!;
+                                },
                               ),
-                            );
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Ops!'),
-                                content: const Text(
-                                  "Prontuário não encontrado, por favor verifique se digitou corretamente e tente novamente!",
-                                  textAlign: TextAlign.justify,
+                              contentPadding: const EdgeInsets.all(0),
+                              title: const Text('Estudante'),
+                            ),
+                          ),
+                          Expanded(
+                            child: RadioListTile(
+                              value: 'employee',
+                              groupValue: _userType,
+                              onChanged: (value) => setState(
+                                () {
+                                  _userType = value!;
+                                },
+                              ),
+                              contentPadding: const EdgeInsets.all(0),
+                              title: const Text('Trabalhador'),
+                            ),
+                          ),
+                        ],
+                      ),
+                      LabelButton(
+                        labelText: 'Entrar',
+                        onPressed: () async {
+                          if (controller.text.isNotEmpty) {
+                            setState(() {
+                              isError = false;
+                            });
+                            bool response = await firebaseServices.login(
+                                userType: _userType,
+                                registration: controller.text);
+
+                            if (response && context.mounted) {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomePage(
+                                    firebaseServices: firebaseServices,
+                                  ),
                                 ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(14),
-                                      child: const Text(
-                                        "Okay",
-                                        style: TextStyle(
-                                          color: Colors.red,
+                              );
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Ops!'),
+                                  content: const Text(
+                                    "Prontuário não encontrado, por favor verifique se digitou corretamente e tente novamente!",
+                                    textAlign: TextAlign.justify,
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(14),
+                                        child: const Text(
+                                          "Okay",
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
+                                  ],
+                                ),
+                              );
+                            }
+                          } else {
+                            setState(() {
+                              isError = true;
+                            });
                           }
-                        } else {
-                          setState(() {
-                            isError = true;
-                          });
-                        }
-                      },
-                    ),
-                  ],
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

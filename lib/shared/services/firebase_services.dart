@@ -40,8 +40,8 @@ class FirebaseServices {
     return false;
   }
 
-  Future<bool> getMenu() async {
-    DateTime currentDate = DateTime.now();
+  Future<bool> getMenu({DateTime? customDate}) async {
+    DateTime currentDate = customDate ?? DateTime.now();
     int weekDate = currentDate.weekday;
 
     DateTime startWeekTime = currentDate.subtract(Duration(days: weekDate - 1));
