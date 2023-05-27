@@ -67,110 +67,127 @@ class _DeleteMenusPageState extends State<DeleteMenusPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: Align(
                     alignment: Alignment.center,
-                    child: StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('menus')
-                          .orderBy('start_of_the_week')
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return const Text('Erro ao carregar os menus');
-                        }
+                    child: SizedBox(
+                      width: 400,
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('menus')
+                            .orderBy('start_of_the_week')
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return const Text('Erro ao carregar os menus');
+                          }
 
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        }
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          }
 
-                        if (snapshot.hasData) {
-                          List<DocumentSnapshot> menuDocs = snapshot.data!.docs;
-                          return SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                //Title
-                                Text(
-                                  'Selecione as semanas abaixo que gostaria de apagar:',
-                                  style: AppTextStyles.titleRegular,
-                                ),
-                                const SizedBox(
-                                  height: 25,
-                                ),
-
-                                Flexible(
-                                  child: ListView.builder(
-                                    itemCount: menuDocs.length,
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, index) {
-                                      Map<String, dynamic> menuData =
-                                          menuDocs[index].data()
-                                              as Map<String, dynamic>;
-
-                                      return MenuDeleteCard(
-                                        startOfTheWeek:
-                                            menuData['start_of_the_week'],
-                                        endOfTheWeek:
-                                            menuData['end_of_the_week'],
-                                        onChanged: () {
-                                          addMenuToDelete(menuDocs[index]);
-                                        },
-                                      );
-                                    },
+                          if (snapshot.hasData) {
+                            List<DocumentSnapshot> menuDocs =
+                                snapshot.data!.docs;
+                            return SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  //Title
+                                  Text(
+                                    'Selecione as semanas abaixo que gostaria de apagar:',
+                                    style: AppTextStyles.titleRegular,
                                   ),
-                                ),
+                                  const SizedBox(
+                                    height: 25,
+                                  ),
 
-                                const SizedBox(
-                                  height: 25,
-                                ),
-                                LabelButton(
-                                    labelText: 'Apagar Semanas Selecionadas',
-                                    color: Colors.red,
-                                    onPressed: () {
-                                      if (deleteMenus.isEmpty) {
-                                        showAlert(context);
-                                      } else {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return AlertDialog(
-                                              title: const Text('Tem certeza?'),
-                                              content: const Text(
-                                                  'Lembre-se, não é possível voltar atrás dessa decisão.'),
-                                              actions: [
-                                                TextButton(
-                                                  child: const Text(
-                                                    'Cancelar',
-                                                    style: TextStyle(
-                                                        color: Colors.red),
-                                                  ),
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                                TextButton(
-                                                  child: const Text(
-                                                      'Sim, tenho certeza!'),
-                                                  onPressed: () {
-                                                    FirebaseServices()
-                                                        .deleteMenuItems(
-                                                            deleteMenus);
-                                                    Navigator.pop(context);
-                                                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage(firebaseServices: widget.firebaseServices),),   (route) => false,);
-                                                  },
-                                                ),
-                                              ],
-                                            );
+                                  Flexible(
+                                    child: ListView.builder(
+                                      itemCount: menuDocs.length,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        Map<String, dynamic> menuData =
+                                            menuDocs[index].data()
+                                                as Map<String, dynamic>;
+
+                                        return MenuDeleteCard(
+                                          startOfTheWeek:
+                                              menuData['start_of_the_week'],
+                                          endOfTheWeek:
+                                              menuData['end_of_the_week'],
+                                          onChanged: () {
+                                            addMenuToDelete(menuDocs[index]);
                                           },
                                         );
-                                      }
-                                    })
-                              ],
-                            ),
-                          );
-                        }
+                                      },
+                                    ),
+                                  ),
 
-                        return const CircularProgressIndicator();
-                      },
+                                  const SizedBox(
+                                    height: 25,
+                                  ),
+                                  LabelButton(
+                                      labelText: 'Apagar Semanas Selecionadas',
+                                      color: Colors.red,
+                                      onPressed: () {
+                                        if (deleteMenus.isEmpty) {
+                                          showAlert(context);
+                                        } else {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title:
+                                                    const Text('Tem certeza?'),
+                                                content: const Text(
+                                                    'Lembre-se, não é possível voltar atrás dessa decisão.'),
+                                                actions: [
+                                                  TextButton(
+                                                    child: const Text(
+                                                      'Cancelar',
+                                                      style: TextStyle(
+                                                          color: Colors.red),
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  ),
+                                                  TextButton(
+                                                    child: const Text(
+                                                        'Sim, tenho certeza!'),
+                                                    onPressed: () {
+                                                      FirebaseServices()
+                                                          .deleteMenuItems(
+                                                              deleteMenus);
+                                                      Navigator.pop(context);
+                                                      Navigator
+                                                          .pushAndRemoveUntil(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              HomePage(
+                                                                  firebaseServices:
+                                                                      widget
+                                                                          .firebaseServices),
+                                                        ),
+                                                        (route) => false,
+                                                      );
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        }
+                                      })
+                                ],
+                              ),
+                            );
+                          }
+
+                          return const CircularProgressIndicator();
+                        },
+                      ),
                     ),
                   ),
                 ),
