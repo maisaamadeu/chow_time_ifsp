@@ -1,3 +1,4 @@
+import 'package:chow_time_ifsp/modules/home/home_page.dart';
 import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
 import 'package:chow_time_ifsp/shared/themes/app_colors.dart';
 import 'package:chow_time_ifsp/shared/themes/app_images.dart';
@@ -14,13 +15,15 @@ class EditPage extends StatefulWidget {
       this.salad,
       this.fruit,
       required this.id,
-      required this.index});
+      required this.index, required this.firebaseServices, required this.lastDateTime});
 
   final String? mainCourse;
   final String? salad;
   final String? fruit;
   final int index;
   final String id;
+  final FirebaseServices firebaseServices;
+  final DateTime lastDateTime;
 
   @override
   State<EditPage> createState() => _EditPageState();
@@ -146,7 +149,19 @@ class _EditPageState extends State<EditPage> {
                                                   salad: saladController.text);
                                               if (context.mounted) {
                                                 Navigator.pop(context);
-                                                Navigator.pop(context);
+                                                Navigator
+                                                    .pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        HomePage(
+                                                            firebaseServices:
+                                                            widget
+                                                                .firebaseServices,
+                                                        customDate: widget.lastDateTime),
+                                                  ),
+                                                      (route) => false,
+                                                );
                                               }
                                             },
                                           ),

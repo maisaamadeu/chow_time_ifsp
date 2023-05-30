@@ -15,7 +15,8 @@ class ChowCard extends StatefulWidget {
       required this.date,
       this.students,
       required this.id,
-      required this.containsStudent});
+      required this.containsStudent,
+      this.lastIndex});
 
   final String? mainCourse;
   final String? salad;
@@ -27,6 +28,7 @@ class ChowCard extends StatefulWidget {
   final bool isEmployee;
   final VoidCallback? onPressed;
   final String id;
+  final bool? lastIndex;
 
   @override
   State<ChowCard> createState() => _ChowCardState();
@@ -46,15 +48,9 @@ class _ChowCardState extends State<ChowCard> {
     DateTime currentDate = DateTime.now();
     DateTime providedDate = DateFormat('dd/MM/yyyy').parse(date);
 
-    if (currentDate.year == providedDate.year &&
-        currentDate.month == providedDate.month &&
-        currentDate.day > providedDate.day) {
-      return true;
-    } else if (currentDate.year == providedDate.year &&
-        currentDate.month == providedDate.month &&
-        currentDate.day == providedDate.day &&
-        currentDate.hour >= 8 &&
-        currentDate.minute >= 30) {
+    // print("Data Atual: $currentDate\nData Provida: $providedDate\nJá passou: ${currentDate.isAfter(providedDate)}\n-------");
+
+    if (currentDate.isAfter(providedDate)) {
       return true;
     }
 
@@ -63,99 +59,127 @@ class _ChowCardState extends State<ChowCard> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.mainCourse == null &&
-        widget.salad == null &&
-        widget.fruit == null) {
-      return Card(
-        child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-          ),
-          title: Text(
-            widget.date,
-            style: AppTextStyles.titleListTile,
-          ),
-          subtitle: Text(
-            !isPassed
-                ? 'Nada foi informado até o momento!'
-                : 'Nada foi informado neste dia!',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: AppColors.delete,
+    if (widget.mainCourse == null ||
+        widget.mainCourse == '' ||
+        widget.salad == null ||
+        widget.salad == '' ||
+        widget.fruit == null ||
+        widget.fruit == '') {
+      return Column(
+        children: [
+          Card(
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+              title: Text(
+                widget.date,
+                style: AppTextStyles.titleListTile,
+              ),
+              subtitle: Text(
+                !isPassed
+                    ? 'Nada foi informado até o momento ou está incompleto!'
+                    : 'Nada foi informado neste dia!',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.delete,
+                ),
+              ),
+              trailing: isPassed
+                  ? null
+                  : widget.isEmployee
+                      ? IconButton(
+                          onPressed: widget.onPressed ?? () {},
+                          icon: const Icon(
+                            Icons.edit,
+                            color: AppColors.delete,
+                          ),
+                        )
+                      : null,
             ),
           ),
-          trailing: !isPassed
-              ? widget.isEmployee
-                  ? IconButton(
-                      onPressed: widget.onPressed ?? () {},
-                      icon: const Icon(
-                        Icons.edit,
-                        color: AppColors.delete,
-                      ),
-                    )
-                  : null
-              : null,
-        ),
+          widget.lastIndex == true
+              ? Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    'Produzido com amor pelos alunos de Redes 3 de 2023: Maísa, Hallisson e Gabriel ❤️❤️❤️',
+                    style: AppTextStyles.trailingRegular,
+                  ),
+                )
+              : Container()
+        ],
       );
     } else {
-      return Card(
-        child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-          ),
-          title: Text(
-            widget.date,
-            style: AppTextStyles.titleListTile,
-          ),
-          subtitle: RichText(
-            text: TextSpan(
-              style: AppTextStyles.trailingRegular,
-              children: <TextSpan>[
-                const TextSpan(
-                  text: 'Prato Principal: ',
+      return Column(
+        children: [
+          Card(
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+              title: Text(
+                widget.date,
+                style: AppTextStyles.titleListTile,
+              ),
+              subtitle: RichText(
+                text: TextSpan(
+                  style: AppTextStyles.trailingRegular,
+                  children: <TextSpan>[
+                    const TextSpan(
+                      text: 'Prato Principal: ',
+                    ),
+                    TextSpan(
+                      text: '${widget.mainCourse}\n',
+                    ),
+                    const TextSpan(
+                      text: 'Salada: ',
+                    ),
+                    TextSpan(
+                      text: '${widget.salad}\n',
+                    ),
+                    const TextSpan(
+                      text: 'Fruta: ',
+                    ),
+                    TextSpan(
+                      text: '${widget.fruit}\n',
+                    ),
+                    widget.isEmployee
+                        ? TextSpan(
+                            text: 'Alunos: ${widget.students.toString()}')
+                        : const TextSpan(),
+                  ],
                 ),
-                TextSpan(
-                  text: '${widget.mainCourse}\n',
-                ),
-                const TextSpan(
-                  text: 'Salada: ',
-                ),
-                TextSpan(
-                  text: '${widget.salad}\n',
-                ),
-                const TextSpan(
-                  text: 'Fruta: ',
-                ),
-                TextSpan(
-                  text: '${widget.fruit}\n',
-                ),
-                widget.isEmployee
-                    ? TextSpan(text: 'Alunos: ${widget.students.toString()}')
-                    : const TextSpan(),
-              ],
+              ),
+              trailing: !isPassed
+                  ? widget.isEmployee
+                      ? IconButton(
+                          onPressed: widget.onPressed ?? () {},
+                          icon: const Icon(
+                            Icons.edit,
+                            color: AppColors.primary,
+                          ))
+                      : Transform.scale(
+                scale: 1.3,
+                        child: Checkbox(
+                            value: widget.containsStudent,
+                            onChanged: (value) {
+                              widget.onPressed!();
+                            }, ),
+                      )
+                  : null,
             ),
           ),
-          trailing: !isPassed
-              ? IconButton(
-                  onPressed: widget.onPressed ?? () {},
-                  icon: widget.isEmployee
-                      ? const Icon(
-                          Icons.edit,
-                          color: AppColors.primary,
-                        )
-                      : widget.containsStudent
-                          ? const Icon(
-                              Icons.done,
-                              color: AppColors.primary,
-                            )
-                          : const Icon(
-                              Icons.close,
-                              color: AppColors.delete,
-                            ),
+          widget.lastIndex == true
+              ? Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    'Produzido com amor pelos alunos de Redes 3 de 2023: Maísa, Hallisson e Gabriel ❤️❤️❤️',
+                    style: AppTextStyles.trailingRegular,
+                  ),
                 )
-              : null,
-        ),
+              : Container()
+        ],
       );
     }
   }

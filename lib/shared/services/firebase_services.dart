@@ -176,35 +176,70 @@ class FirebaseServices {
             'fruit': null,
             'main_course': null,
             'students': [],
-            'date': Timestamp.fromDate(datesList[0]),
+            'date': Timestamp.fromDate(
+              datesList[0].add(
+                Duration(
+                  hours: 8,
+                  minutes: 30,
+                ),
+              ),
+            ),
           },
           {
             'salad': null,
             'fruit': null,
             'main_course': null,
             'students': [],
-            'date': Timestamp.fromDate(datesList[1]),
+            'date': Timestamp.fromDate(
+              datesList[1].add(
+                Duration(
+                  hours: 8,
+                  minutes: 30,
+                ),
+              ),
+            ),
           },
           {
             'salad': null,
             'fruit': null,
             'main_course': null,
             'students': [],
-            'date': Timestamp.fromDate(datesList[2]),
+            'date': Timestamp.fromDate(
+              datesList[2].add(
+                Duration(
+                  hours: 8,
+                  minutes: 30,
+                ),
+              ),
+            ),
           },
           {
             'salad': null,
             'fruit': null,
             'main_course': null,
             'students': [],
-            'date': Timestamp.fromDate(datesList[3]),
+            'date': Timestamp.fromDate(
+              datesList[3].add(
+                Duration(
+                  hours: 8,
+                  minutes: 30,
+                ),
+              ),
+            ),
           },
           {
             'salad': null,
             'fruit': null,
             'main_course': null,
             'students': [],
-            'date': Timestamp.fromDate(datesList[4]),
+            'date': Timestamp.fromDate(
+              datesList[4].add(
+                Duration(
+                  hours: 8,
+                  minutes: 30,
+                ),
+              ),
+            ),
           }
         ]
       };

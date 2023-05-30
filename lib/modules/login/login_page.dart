@@ -49,6 +49,13 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Image(
+                        image: AssetImage('assets/images/ifsp.png'),
+                        height: 200,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
                       Text(
                         'Insira os dados abaixo para realizar o login',
                         style: AppTextStyles.titleRegular,
