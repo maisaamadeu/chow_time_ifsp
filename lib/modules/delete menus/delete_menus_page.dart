@@ -11,6 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class DeleteMenusPage extends StatefulWidget {
   const DeleteMenusPage({super.key, required this.firebaseServices});
+
   final FirebaseServices firebaseServices;
 
   @override
@@ -58,6 +59,7 @@ class _DeleteMenusPageState extends State<DeleteMenusPage> {
                 child: SvgPicture.asset(
                   AppImages.background,
                   semanticsLabel: 'Background Wave',
+                  width: MediaQuery.of(context).size.width,
                 ),
               ),
 
@@ -81,7 +83,13 @@ class _DeleteMenusPageState extends State<DeleteMenusPage> {
 
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
+                            return const Center(
+                              child: SizedBox(
+                                width: 30,
+                                height: 30,
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
                           }
 
                           if (snapshot.hasData) {

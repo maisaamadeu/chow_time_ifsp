@@ -61,7 +61,7 @@ class _EditPageState extends State<EditPage> {
               bottom: 0,
               child: SvgPicture.asset(
                 AppImages.background,
-                semanticsLabel: 'Background Wave',
+                semanticsLabel: 'Background Wave', width: MediaQuery.of(context).size.width,
               ),
             ),
 
@@ -95,7 +95,7 @@ class _EditPageState extends State<EditPage> {
                           height: 10,
                         ),
                         InputData(
-                          labelText: 'Salad',
+                          labelText: 'Salada',
                           controller: saladController,
                           isError: isSaladError,
                           errorText: '',
@@ -104,7 +104,7 @@ class _EditPageState extends State<EditPage> {
                           height: 10,
                         ),
                         InputData(
-                          labelText: 'Fruit',
+                          labelText: 'Fruta',
                           controller: fruitController,
                           isError: isFruitError,
                           errorText: '',

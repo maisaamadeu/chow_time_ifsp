@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
             bottom: 0,
             child: SvgPicture.asset(
               AppImages.background,
-              semanticsLabel: 'Background Wave',
+              semanticsLabel: 'Background Wave', width: MediaQuery.of(context).size.width,
             ),
           ),
 
@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image(
+                      const Image(
                         image: AssetImage('assets/images/ifsp.png'),
                         height: 200,
                       ),

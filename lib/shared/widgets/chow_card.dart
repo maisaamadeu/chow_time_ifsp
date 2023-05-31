@@ -44,9 +44,30 @@ class _ChowCardState extends State<ChowCard> {
     isPassed = hasPassedDate(widget.date);
   }
 
+  void showAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Ops!'),
+          content: const Text(
+              'Infelizmente acabou o tempo para selecionar se irá comer ou não!'),
+          actions: [
+            TextButton(
+              child: const Text('Voltar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   bool hasPassedDate(String date) {
     DateTime currentDate = DateTime.now();
-    DateTime providedDate = DateFormat('dd/MM/yyyy').parse(date);
+    DateTime providedDate = DateFormat('dd/MM/yyyy - HH:mm:ss').parse(date);
 
     // print("Data Atual: $currentDate\nData Provida: $providedDate\nJá passou: ${currentDate.isAfter(providedDate)}\n-------");
 
@@ -101,7 +122,7 @@ class _ChowCardState extends State<ChowCard> {
           ),
           widget.lastIndex == true
               ? Container(
-                  margin: EdgeInsets.only(top: 10),
+                  margin: const EdgeInsets.only(top: 10),
                   child: Text(
                     'Produzido com amor pelos alunos de Redes 3 de 2023: Maísa, Hallisson e Gabriel ❤️❤️❤️',
                     style: AppTextStyles.trailingRegular,
@@ -160,19 +181,24 @@ class _ChowCardState extends State<ChowCard> {
                             color: AppColors.primary,
                           ))
                       : Transform.scale(
-                scale: 1.3,
-                        child: Checkbox(
+                          scale: 1.3,
+                          child: Checkbox(
                             value: widget.containsStudent,
                             onChanged: (value) {
+                              if(hasPassedDate(widget.date)) {
+                                showAlert(context);
+                                return;
+                              }
                               widget.onPressed!();
-                            }, ),
-                      )
+                            },
+                          ),
+                        )
                   : null,
             ),
           ),
           widget.lastIndex == true
               ? Container(
-                  margin: EdgeInsets.only(top: 10),
+                  margin: const EdgeInsets.only(top: 10),
                   child: Text(
                     'Produzido com amor pelos alunos de Redes 3 de 2023: Maísa, Hallisson e Gabriel ❤️❤️❤️',
                     style: AppTextStyles.trailingRegular,

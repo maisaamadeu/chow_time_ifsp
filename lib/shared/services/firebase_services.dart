@@ -11,74 +11,89 @@ class FirebaseServices {
   QueryDocumentSnapshot? currentMenu;
 
   Future<void> initFirebase() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    try {
+      WidgetsFlutterBinding.ensureInitialized();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (e) {
+      debugPrint('Erro ao inicializar o Firebase: $e');
+    }
   }
 
   Future<bool> login({
     required String userType,
     required String registration,
   }) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('${userType}s')
-        .where('registration', isEqualTo: registration)
-        .get();
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('${userType}s')
+          .where('registration', isEqualTo: registration)
+          .get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      user = UserModel(
-        firstName: (querySnapshot.docs[0].data() as Map)['first_name'],
-        lastName: (querySnapshot.docs[0].data() as Map)['last_name'],
-        registration: (querySnapshot.docs[0].data() as Map)['registration'],
-        userType: userType,
-      );
+      if (querySnapshot.docs.isNotEmpty) {
+        user = UserModel(
+          firstName: (querySnapshot.docs[0].data() as Map)['first_name'],
+          lastName: (querySnapshot.docs[0].data() as Map)['last_name'],
+          registration: (querySnapshot.docs[0].data() as Map)['registration'],
+          userType: userType,
+        );
 
-      return true;
+        return true;
+      }
+
+      return false;
+    } catch (e) {
+      debugPrint('Erro ao fazer login: $e');
+      return false;
     }
-
-    return false;
   }
 
   Future<bool> getMenu({DateTime? customDate}) async {
-    DateTime currentDate = customDate ?? DateTime.now();
-    int weekDate = currentDate.weekday;
+    try {
+      DateTime currentDate = customDate ?? DateTime.now();
+      int weekDate = currentDate.weekday;
 
-    DateTime startWeekTime = currentDate.subtract(Duration(days: weekDate - 1));
-    DateTime endWeekTime = startWeekTime.add(const Duration(days: 4));
+      DateTime startWeekTime = currentDate.subtract(Duration(days: weekDate - 1));
+      DateTime endWeekTime = startWeekTime.add(const Duration(days: 4));
 
-    String formattedStartWeekTime =
-        DateFormat('dd/MM/yyyy').format(startWeekTime);
-    String formattedEndWeekTime = DateFormat('dd/MM/yyyy').format(endWeekTime);
+      String formattedStartWeekTime =
+      DateFormat('dd/MM/yyyy').format(startWeekTime);
+      String formattedEndWeekTime = DateFormat('dd/MM/yyyy').format(endWeekTime);
 
-    allMenus = await FirebaseFirestore.instance.collection('menus').get();
+      allMenus = await FirebaseFirestore.instance.collection('menus').get();
 
-    if (allMenus != null) {
-      if (weekDate > 5) {
-        startWeekTime =
-            startWeekTime.add(const Duration(days: 7)); //Não está adicionando
-        endWeekTime =
-            endWeekTime.add(const Duration(days: 7)); //Não está adicionado
-        formattedStartWeekTime = DateFormat('dd/MM/yyyy').format(startWeekTime);
-        formattedEndWeekTime = DateFormat('dd/MM/yyyy').format(endWeekTime);
-        weekDate = 1;
-      }
+      if (allMenus != null) {
+        if (weekDate > 5) {
+          startWeekTime =
+              startWeekTime.add(const Duration(days: 7)); //Não está adicionando
+          endWeekTime =
+              endWeekTime.add(const Duration(days: 7)); //Não está adicionado
+          formattedStartWeekTime =
+              DateFormat('dd/MM/yyyy').format(startWeekTime);
+          formattedEndWeekTime = DateFormat('dd/MM/yyyy').format(endWeekTime);
+          weekDate = 1;
+        }
 
-      for (var menu in allMenus!.docs) {
-        String formattedStartOfTheWeekInMenu = DateFormat('dd/MM/yyyy').format(
-            ((menu.data() as Map)['start_of_the_week'] as Timestamp).toDate());
-        String formatedEndOfTheWeekInMenu = DateFormat('dd/MM/yyyy').format(
-            ((menu.data() as Map)['end_of_the_week'] as Timestamp).toDate());
+        for (var menu in allMenus!.docs) {
+          String formattedStartOfTheWeekInMenu = DateFormat('dd/MM/yyyy').format(
+              ((menu.data() as Map)['start_of_the_week'] as Timestamp).toDate());
+          String formatedEndOfTheWeekInMenu = DateFormat('dd/MM/yyyy').format(
+              ((menu.data() as Map)['end_of_the_week'] as Timestamp).toDate());
 
-        if (formattedStartOfTheWeekInMenu == formattedStartWeekTime &&
-            formatedEndOfTheWeekInMenu == formattedEndWeekTime) {
-          currentMenu = menu;
+          if (formattedStartOfTheWeekInMenu == formattedStartWeekTime &&
+              formatedEndOfTheWeekInMenu == formattedEndWeekTime) {
+            currentMenu = menu;
 
-          return true;
+            return true;
+          }
         }
       }
+      return false;
+    } catch (e) {
+      debugPrint('Erro ao obter o menu: $e');
+      return false;
     }
-    return false;
   }
 
   Future<void> editMenu({
@@ -88,21 +103,25 @@ class FirebaseServices {
     required String documentID,
     required int index,
   }) async {
-    var menuRef =
-        FirebaseFirestore.instance.collection('menus').doc(documentID);
+    try {
+      var menuRef =
+      FirebaseFirestore.instance.collection('menus').doc(documentID);
 
-    var snapshot = await menuRef.get();
+      var snapshot = await menuRef.get();
 
-    if (snapshot.exists) {
-      var data = snapshot.data();
-      var menuDays = data!['menu_days'];
+      if (snapshot.exists) {
+        var data = snapshot.data();
+        var menuDays = data!['menu_days'];
 
-      menuDays[index]['salad'] = salad;
-      menuDays[index]['main_course'] = mainCourse;
-      menuDays[index]['fruit'] = fruit;
+        menuDays[index]['salad'] = salad;
+        menuDays[index]['main_course'] = mainCourse;
+        menuDays[index]['fruit'] = fruit;
 
-      await menuRef.set(data);
-    } else {}
+        await menuRef.set(data);
+      }
+    } catch (e) {
+      debugPrint('Erro ao editar o menu: $e');
+    }
   }
 
   Future<void> addOrRemoveStudent({
@@ -111,10 +130,10 @@ class FirebaseServices {
     required String documentID,
     required VoidCallback callback,
   }) async {
-    var studentsRef =
-        FirebaseFirestore.instance.collection('menus').doc(documentID);
-
     try {
+      var studentsRef =
+      FirebaseFirestore.instance.collection('menus').doc(documentID);
+
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         var snapshot = await transaction.get(studentsRef);
 
@@ -139,23 +158,32 @@ class FirebaseServices {
   }
 
   Future<void> addWeek() async {
-    CollectionReference allMenus =
-        FirebaseFirestore.instance.collection('menus');
-    QuerySnapshot lastDates = await FirebaseFirestore.instance
-        .collection('menus')
-        .orderBy('start_of_the_week', descending: true)
-        .limit(1)
-        .get();
+    try {
+      CollectionReference allMenus =
+      FirebaseFirestore.instance.collection('menus');
+      QuerySnapshot lastDates = await FirebaseFirestore.instance
+          .collection('menus')
+          .orderBy('start_of_the_week', descending: true)
+          .limit(1)
+          .get();
 
-    List<QueryDocumentSnapshot> documents = lastDates.docs;
+      List<QueryDocumentSnapshot> documents = lastDates.docs;
 
-    if (documents.isNotEmpty) {
       List<DateTime> datesList = [];
+      late DateTime startOfTheWeek;
+      late DateTime endOfTheWeek;
 
-      DateTime startOfTheWeek =
-          (documents.first['start_of_the_week'] as Timestamp).toDate();
-      DateTime endOfTheWeek =
-          (documents.last['end_of_the_week'] as Timestamp).toDate();
+      if (documents.isNotEmpty) {
+        startOfTheWeek =
+            (documents.first['start_of_the_week'] as Timestamp).toDate();
+        endOfTheWeek = (documents.last['end_of_the_week'] as Timestamp).toDate();
+      } else {
+        DateTime currentDate = DateTime.now();
+        int weekDate = currentDate.weekday;
+
+        startOfTheWeek = currentDate.subtract(Duration(days: weekDate - 1));
+        endOfTheWeek = startOfTheWeek.add(const Duration(days: 4));
+      }
 
       DateTime newStartOfTheWeek = startOfTheWeek.add(const Duration(days: 7));
       DateTime newEndOfTheWeek = endOfTheWeek.add(const Duration(days: 7));
@@ -167,8 +195,7 @@ class FirebaseServices {
       }
 
       final newWeek = {
-        'start_of_the_week':
-            newStartOfTheWeek.subtract(const Duration(days: 5)),
+        'start_of_the_week': newStartOfTheWeek.subtract(const Duration(days: 5)),
         'end_of_the_week': newEndOfTheWeek,
         'menu_days': [
           {
@@ -178,7 +205,7 @@ class FirebaseServices {
             'students': [],
             'date': Timestamp.fromDate(
               datesList[0].add(
-                Duration(
+                const Duration(
                   hours: 8,
                   minutes: 30,
                 ),
@@ -192,7 +219,7 @@ class FirebaseServices {
             'students': [],
             'date': Timestamp.fromDate(
               datesList[1].add(
-                Duration(
+                const Duration(
                   hours: 8,
                   minutes: 30,
                 ),
@@ -206,7 +233,7 @@ class FirebaseServices {
             'students': [],
             'date': Timestamp.fromDate(
               datesList[2].add(
-                Duration(
+                const Duration(
                   hours: 8,
                   minutes: 30,
                 ),
@@ -220,7 +247,7 @@ class FirebaseServices {
             'students': [],
             'date': Timestamp.fromDate(
               datesList[3].add(
-                Duration(
+                const Duration(
                   hours: 8,
                   minutes: 30,
                 ),
@@ -234,7 +261,7 @@ class FirebaseServices {
             'students': [],
             'date': Timestamp.fromDate(
               datesList[4].add(
-                Duration(
+                const Duration(
                   hours: 8,
                   minutes: 30,
                 ),
@@ -244,19 +271,21 @@ class FirebaseServices {
         ]
       };
 
-      allMenus.add(newWeek);
+      await allMenus.add(newWeek);
+    } catch (e) {
+      debugPrint('Erro ao adicionar a semana: $e');
     }
   }
 
   Future<void> deleteMenuItems(
       List<DocumentSnapshot<Object?>> deleteMenus) async {
-    WriteBatch batch = FirebaseFirestore.instance.batch();
-
-    for (DocumentSnapshot<Object?> document in deleteMenus) {
-      batch.delete(document.reference);
-    }
-
     try {
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+
+      for (DocumentSnapshot<Object?> document in deleteMenus) {
+        batch.delete(document.reference);
+      }
+
       await batch.commit();
     } catch (error) {
       debugPrint('Erro ao excluir documentos: $error');
