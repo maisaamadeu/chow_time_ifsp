@@ -336,6 +336,8 @@ class FirebaseServices {
       }
 
       await batch.commit();
+
+      print('Apagou');
     } catch (error) {
       debugPrint('Erro ao excluir documentos: $error');
     }
