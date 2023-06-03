@@ -1,5 +1,5 @@
 import 'package:chow_time_ifsp/modules/delete%20menus/delete_menus_page.dart';
-import 'package:chow_time_ifsp/modules/edit/edit_page.dart';
+import 'package:chow_time_ifsp/modules/edit%20menu/edit_menu_page.dart';
 import 'package:chow_time_ifsp/modules/login/login_page.dart';
 import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
 import 'package:chow_time_ifsp/shared/themes/app_images.dart';
@@ -335,7 +335,7 @@ class _HomePageState extends State<HomePage> {
                                                                     MaterialPageRoute(
                                                                       builder:
                                                                           (context) =>
-                                                                              EditPage(
+                                                                              EditMenuPage(
                                                                         id: currentMenuID,
                                                                         fruit: currentMenu[index]
                                                                             [

@@ -1,4 +1,4 @@
-import 'package:chow_time_ifsp/modules/login/login_page.dart';
+import 'package:chow_time_ifsp/modules/edit%20people/edit_people_page.dart';
 import 'package:flutter/material.dart';
 
 class AppWidget extends StatelessWidget {
@@ -15,7 +15,7 @@ class AppWidget extends StatelessWidget {
           seedColor: Colors.green,
         ),
       ),
-      home: const LoginPage(),
+      home: const EditPeoplePage(),
     );
   }
 }

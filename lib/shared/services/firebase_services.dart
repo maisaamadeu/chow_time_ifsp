@@ -21,11 +21,35 @@ class FirebaseServices {
     }
   }
 
+  Future<List<QueryDocumentSnapshot>?> getPeople({required String type}) async {
+    try {
+      if (Firebase.apps.isEmpty) {
+        await initFirebase();
+      }
+
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection(type).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        List<QueryDocumentSnapshot> docs = querySnapshot.docs;
+        return docs;
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    return null;
+  }
+
   Future<bool> login({
     required String userType,
     required String registration,
   }) async {
     try {
+      if (Firebase.apps.isEmpty) {
+        await initFirebase();
+      }
+
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('${userType}s')
           .where('registration', isEqualTo: registration)
@@ -51,15 +75,21 @@ class FirebaseServices {
 
   Future<bool> getMenu({DateTime? customDate}) async {
     try {
+      if (Firebase.apps.isEmpty) {
+        await initFirebase();
+      }
+
       DateTime currentDate = customDate ?? DateTime.now();
       int weekDate = currentDate.weekday;
 
-      DateTime startWeekTime = currentDate.subtract(Duration(days: weekDate - 1));
+      DateTime startWeekTime =
+          currentDate.subtract(Duration(days: weekDate - 1));
       DateTime endWeekTime = startWeekTime.add(const Duration(days: 4));
 
       String formattedStartWeekTime =
-      DateFormat('dd/MM/yyyy').format(startWeekTime);
-      String formattedEndWeekTime = DateFormat('dd/MM/yyyy').format(endWeekTime);
+          DateFormat('dd/MM/yyyy').format(startWeekTime);
+      String formattedEndWeekTime =
+          DateFormat('dd/MM/yyyy').format(endWeekTime);
 
       allMenus = await FirebaseFirestore.instance.collection('menus').get();
 
@@ -76,8 +106,9 @@ class FirebaseServices {
         }
 
         for (var menu in allMenus!.docs) {
-          String formattedStartOfTheWeekInMenu = DateFormat('dd/MM/yyyy').format(
-              ((menu.data() as Map)['start_of_the_week'] as Timestamp).toDate());
+          String formattedStartOfTheWeekInMenu = DateFormat('dd/MM/yyyy')
+              .format(((menu.data() as Map)['start_of_the_week'] as Timestamp)
+                  .toDate());
           String formatedEndOfTheWeekInMenu = DateFormat('dd/MM/yyyy').format(
               ((menu.data() as Map)['end_of_the_week'] as Timestamp).toDate());
 
@@ -104,8 +135,12 @@ class FirebaseServices {
     required int index,
   }) async {
     try {
+      if (Firebase.apps.isEmpty) {
+        await initFirebase();
+      }
+
       var menuRef =
-      FirebaseFirestore.instance.collection('menus').doc(documentID);
+          FirebaseFirestore.instance.collection('menus').doc(documentID);
 
       var snapshot = await menuRef.get();
 
@@ -131,8 +166,12 @@ class FirebaseServices {
     required VoidCallback callback,
   }) async {
     try {
+      if (Firebase.apps.isEmpty) {
+        await initFirebase();
+      }
+
       var studentsRef =
-      FirebaseFirestore.instance.collection('menus').doc(documentID);
+          FirebaseFirestore.instance.collection('menus').doc(documentID);
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         var snapshot = await transaction.get(studentsRef);
@@ -159,8 +198,12 @@ class FirebaseServices {
 
   Future<void> addWeek() async {
     try {
+      if (Firebase.apps.isEmpty) {
+        await initFirebase();
+      }
+
       CollectionReference allMenus =
-      FirebaseFirestore.instance.collection('menus');
+          FirebaseFirestore.instance.collection('menus');
       QuerySnapshot lastDates = await FirebaseFirestore.instance
           .collection('menus')
           .orderBy('start_of_the_week', descending: true)
@@ -176,7 +219,8 @@ class FirebaseServices {
       if (documents.isNotEmpty) {
         startOfTheWeek =
             (documents.first['start_of_the_week'] as Timestamp).toDate();
-        endOfTheWeek = (documents.last['end_of_the_week'] as Timestamp).toDate();
+        endOfTheWeek =
+            (documents.last['end_of_the_week'] as Timestamp).toDate();
       } else {
         DateTime currentDate = DateTime.now();
         int weekDate = currentDate.weekday;
@@ -195,7 +239,8 @@ class FirebaseServices {
       }
 
       final newWeek = {
-        'start_of_the_week': newStartOfTheWeek.subtract(const Duration(days: 5)),
+        'start_of_the_week':
+            newStartOfTheWeek.subtract(const Duration(days: 5)),
         'end_of_the_week': newEndOfTheWeek,
         'menu_days': [
           {
@@ -280,6 +325,10 @@ class FirebaseServices {
   Future<void> deleteMenuItems(
       List<DocumentSnapshot<Object?>> deleteMenus) async {
     try {
+      if (Firebase.apps.isEmpty) {
+        await initFirebase();
+      }
+
       WriteBatch batch = FirebaseFirestore.instance.batch();
 
       for (DocumentSnapshot<Object?> document in deleteMenus) {

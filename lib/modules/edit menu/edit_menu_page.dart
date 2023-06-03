@@ -8,14 +8,16 @@ import 'package:chow_time_ifsp/shared/widgets/label_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class EditPage extends StatefulWidget {
-  const EditPage(
+class EditMenuPage extends StatefulWidget {
+  const EditMenuPage(
       {super.key,
       this.mainCourse,
       this.salad,
       this.fruit,
       required this.id,
-      required this.index, required this.firebaseServices, required this.lastDateTime});
+      required this.index,
+      required this.firebaseServices,
+      required this.lastDateTime});
 
   final String? mainCourse;
   final String? salad;
@@ -26,10 +28,10 @@ class EditPage extends StatefulWidget {
   final DateTime lastDateTime;
 
   @override
-  State<EditPage> createState() => _EditPageState();
+  State<EditMenuPage> createState() => _EditPageState();
 }
 
-class _EditPageState extends State<EditPage> {
+class _EditPageState extends State<EditMenuPage> {
   TextEditingController mainCourseController = TextEditingController();
   TextEditingController fruitController = TextEditingController();
   TextEditingController saladController = TextEditingController();
@@ -61,7 +63,8 @@ class _EditPageState extends State<EditPage> {
               bottom: 0,
               child: SvgPicture.asset(
                 AppImages.background,
-                semanticsLabel: 'Background Wave', width: MediaQuery.of(context).size.width,
+                semanticsLabel: 'Background Wave',
+                width: MediaQuery.of(context).size.width,
               ),
             ),
 
@@ -149,18 +152,16 @@ class _EditPageState extends State<EditPage> {
                                                   salad: saladController.text);
                                               if (context.mounted) {
                                                 Navigator.pop(context);
-                                                Navigator
-                                                    .pushAndRemoveUntil(
+                                                Navigator.pushAndRemoveUntil(
                                                   context,
                                                   MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        HomePage(
-                                                            firebaseServices:
-                                                            widget
-                                                                .firebaseServices,
-                                                        customDate: widget.lastDateTime),
+                                                    builder: (context) => HomePage(
+                                                        firebaseServices: widget
+                                                            .firebaseServices,
+                                                        customDate: widget
+                                                            .lastDateTime),
                                                   ),
-                                                      (route) => false,
+                                                  (route) => false,
                                                 );
                                               }
                                             },

@@ -32,7 +32,8 @@ class _LoginPageState extends State<LoginPage> {
             bottom: 0,
             child: SvgPicture.asset(
               AppImages.background,
-              semanticsLabel: 'Background Wave', width: MediaQuery.of(context).size.width,
+              semanticsLabel: 'Background Wave',
+              width: MediaQuery.of(context).size.width,
             ),
           ),
 
