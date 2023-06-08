@@ -19,7 +19,7 @@ class EditPeoplePage extends StatefulWidget {
 }
 
 class _EditPeoplePageState extends State<EditPeoplePage> {
-  FirebaseServices _firebaseServices = FirebaseServices();
+  final FirebaseServices _firebaseServices = FirebaseServices();
   List<QueryDocumentSnapshot>? studentsList = [];
   List<QueryDocumentSnapshot>? employeesList = [];
   List<QueryDocumentSnapshot> studentsToDelete = [];

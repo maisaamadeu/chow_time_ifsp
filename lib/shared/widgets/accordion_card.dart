@@ -37,7 +37,7 @@ class _AccordionCardState extends State<AccordionCard>
       child: Column(
         children: [
           ListTile(
-            contentPadding: EdgeInsets.symmetric(horizontal: 5),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 5),
             title: Text(widget.title),
             trailing: IconButton(
               icon: AnimatedIcon(
