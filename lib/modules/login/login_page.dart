@@ -1,3 +1,4 @@
+import 'package:chow_time_ifsp/modules/edit%20people/edit_people_page.dart';
 import 'package:chow_time_ifsp/modules/home/home_page.dart';
 import 'package:chow_time_ifsp/shared/services/firebase_services.dart';
 import 'package:chow_time_ifsp/shared/themes/app_colors.dart';
@@ -18,7 +19,11 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String _userType = 'student';
   TextEditingController controller = TextEditingController();
+  TextEditingController passwordEditingController = TextEditingController();
   bool isError = false;
+  bool isPasswordError = false;
+  bool isAdmin = false;
+  int count = 0;
   FirebaseServices firebaseServices = FirebaseServices();
 
   @override
@@ -72,6 +77,20 @@ class _LoginPageState extends State<LoginPage> {
                         errorText: 'Este campo não pode ficar vazio!',
                         isError: isError,
                       ),
+                      isAdmin
+                          ? const SizedBox(
+                              height: 10,
+                            )
+                          : Container(),
+                      isAdmin
+                          ? InputData(
+                              controller: passwordEditingController,
+                              labelText: 'Senha',
+                              hintText: 'Ex: 12345678',
+                              errorText: 'Este campo não pode ficar vazio!',
+                              isError: isPasswordError,
+                            )
+                          : Container(),
                       Row(
                         children: [
                           Expanded(
@@ -81,6 +100,10 @@ class _LoginPageState extends State<LoginPage> {
                               onChanged: (value) => setState(
                                 () {
                                   _userType = value!;
+                                  if (count > 10) {
+                                    isAdmin = false;
+                                    count = 0;
+                                  }
                                 },
                               ),
                               contentPadding: const EdgeInsets.all(0),
@@ -94,6 +117,13 @@ class _LoginPageState extends State<LoginPage> {
                               onChanged: (value) => setState(
                                 () {
                                   _userType = value!;
+                                  count++;
+                                  if (count == 10) {
+                                    isAdmin = true;
+                                  } else if (count > 10) {
+                                    isAdmin = false;
+                                    count = 0;
+                                  }
                                 },
                               ),
                               contentPadding: const EdgeInsets.all(0),
@@ -110,10 +140,22 @@ class _LoginPageState extends State<LoginPage> {
                               isError = false;
                             });
                             bool response = await firebaseServices.login(
-                                userType: _userType,
-                                registration: controller.text);
+                                userType: isAdmin ? 'admin' : _userType,
+                                registration: controller.text,
+                                password: isAdmin
+                                    ? passwordEditingController.text
+                                    : null);
 
                             if (response && context.mounted) {
+                              if (isAdmin) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditPeoplePage(),
+                                  ),
+                                );
+                              }
+
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(

@@ -157,7 +157,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Seja bem-vindo(a) ${widget.firebaseServices.user!.firstName} ${widget.firebaseServices.user!.lastName}!',
+                            'Seja bem-vindo(a) ${widget.firebaseServices.user!.registration}!',
                             style: AppTextStyles.titleHome,
                           ),
                           Text(

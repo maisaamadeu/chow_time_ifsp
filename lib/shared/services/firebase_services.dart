@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:chow_time_ifsp/firebase_options.dart';
 import 'package:chow_time_ifsp/shared/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:csv/csv.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -41,24 +45,28 @@ class FirebaseServices {
     return null;
   }
 
-  Future<bool> login({
-    required String userType,
-    required String registration,
-  }) async {
+  Future<bool> login(
+      {required String userType,
+      required String registration,
+      String? password}) async {
     try {
       if (Firebase.apps.isEmpty) {
         await initFirebase();
       }
-
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('${userType}s')
           .where('registration', isEqualTo: registration)
           .get();
+      if (userType == 'admin') {
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('${userType}s')
+            .where('registration', isEqualTo: registration)
+            .where('password', isEqualTo: password)
+            .get();
+      }
 
       if (querySnapshot.docs.isNotEmpty) {
         user = UserModel(
-          firstName: (querySnapshot.docs[0].data() as Map)['first_name'],
-          lastName: (querySnapshot.docs[0].data() as Map)['last_name'],
           registration: (querySnapshot.docs[0].data() as Map)['registration'],
           userType: userType,
         );
@@ -336,10 +344,90 @@ class FirebaseServices {
       }
 
       await batch.commit();
-
-      print('Apagou');
     } catch (error) {
       debugPrint('Erro ao excluir documentos: $error');
+    }
+  }
+
+  Future<void> deleteAllDocumentsInCollection(
+      String collectionName, BuildContext context) async {
+    try {
+      CollectionReference collectionReference =
+          FirebaseFirestore.instance.collection(collectionName);
+
+      QuerySnapshot querySnapshot = await collectionReference.get();
+
+      querySnapshot.docs.forEach((document) async {
+        await document.reference.delete();
+      });
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Erro'),
+            content:
+                const Text('Ocorreu um erro durante a exclusão dessas pessoas'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Fechar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> importCSVToFirestore(
+      String collectionName, BuildContext context) async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+      );
+
+      if (result != null) {
+        File file = File(result.files.single.path!);
+        String csvData = await file.readAsString();
+
+        List<List<dynamic>> csvTable =
+            const CsvToListConverter().convert(csvData);
+
+        csvTable.removeAt(0);
+
+        CollectionReference collectionReference =
+            FirebaseFirestore.instance.collection(collectionName);
+
+        for (var row in csvTable) {
+          Map<String, dynamic> data = {
+            'registration': row[0],
+          };
+
+          await collectionReference.add(data);
+        }
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Erro'),
+            content: Text('Ocorreu um erro durante a importação do CSV: $e'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Fechar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 }
