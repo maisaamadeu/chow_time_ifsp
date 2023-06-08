@@ -52,154 +52,181 @@ class _LoginPageState extends State<LoginPage> {
                 alignment: Alignment.center,
                 child: SizedBox(
                   width: 400,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Image(
-                        image: AssetImage('assets/images/ifsp.png'),
-                        height: 200,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        'Insira os dados abaixo para realizar o login',
-                        style: AppTextStyles.titleRegular,
-                        textAlign: TextAlign.start,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      InputData(
-                        controller: controller,
-                        labelText: 'Prontuário',
-                        hintText: 'Ex: BT000000',
-                        errorText: 'Este campo não pode ficar vazio!',
-                        isError: isError,
-                      ),
-                      isAdmin
-                          ? const SizedBox(
-                              height: 10,
-                            )
-                          : Container(),
-                      isAdmin
-                          ? InputData(
-                              controller: passwordEditingController,
-                              labelText: 'Senha',
-                              hintText: 'Ex: 12345678',
-                              errorText: 'Este campo não pode ficar vazio!',
-                              isError: isPasswordError,
-                            )
-                          : Container(),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: RadioListTile(
-                              value: 'student',
-                              groupValue: _userType,
-                              onChanged: (value) => setState(
-                                () {
-                                  _userType = value!;
-                                  if (count > 10) {
-                                    isAdmin = false;
-                                    count = 0;
-                                  }
-                                },
-                              ),
-                              contentPadding: const EdgeInsets.all(0),
-                              title: const Text('Estudante'),
-                            ),
-                          ),
-                          Expanded(
-                            child: RadioListTile(
-                              value: 'employee',
-                              groupValue: _userType,
-                              onChanged: (value) => setState(
-                                () {
-                                  _userType = value!;
-                                  count++;
-                                  if (count == 10) {
-                                    isAdmin = true;
-                                  } else if (count > 10) {
-                                    isAdmin = false;
-                                    count = 0;
-                                  }
-                                },
-                              ),
-                              contentPadding: const EdgeInsets.all(0),
-                              title: const Text('Trabalhador'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      LabelButton(
-                        labelText: 'Entrar',
-                        onPressed: () async {
-                          if (controller.text.isNotEmpty) {
-                            setState(() {
-                              isError = false;
-                            });
-                            bool response = await firebaseServices.login(
-                                userType: isAdmin ? 'admin' : _userType,
-                                registration: controller.text,
-                                password: isAdmin
-                                    ? passwordEditingController.text
-                                    : null);
-
-                            if (response && context.mounted) {
-                              if (isAdmin) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EditPeoplePage(),
-                                  ),
-                                );
-                              }
-
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomePage(
-                                    firebaseServices: firebaseServices,
-                                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Image(
+                          image: AssetImage('assets/images/ifsp.png'),
+                          height: 200,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          'Insira os dados abaixo para realizar o login',
+                          style: AppTextStyles.titleRegular,
+                          textAlign: TextAlign.start,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        InputData(
+                          controller: controller,
+                          labelText: 'Prontuário',
+                          hintText: 'Ex: BT000000',
+                          errorText: 'Este campo não pode ficar vazio!',
+                          isError: isError,
+                        ),
+                        isAdmin
+                            ? const SizedBox(
+                                height: 10,
+                              )
+                            : Container(),
+                        isAdmin
+                            ? InputData(
+                                controller: passwordEditingController,
+                                labelText: 'Senha',
+                                hintText: 'Ex: 12345678',
+                                errorText: 'Este campo não pode ficar vazio!',
+                                isError: isPasswordError,
+                              )
+                            : Container(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: RadioListTile(
+                                value: 'student',
+                                groupValue: _userType,
+                                onChanged: (value) => setState(
+                                  () {
+                                    _userType = value!;
+                                    if (count > 10) {
+                                      isAdmin = false;
+                                      count = 0;
+                                    }
+                                  },
                                 ),
-                              );
-                            } else {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Ops!'),
-                                  content: const Text(
-                                    "Prontuário não encontrado, por favor verifique se digitou corretamente e tente novamente!",
-                                    textAlign: TextAlign.justify,
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(14),
-                                        child: const Text(
-                                          "Okay",
-                                          style: TextStyle(
-                                            color: Colors.red,
+                                contentPadding: const EdgeInsets.all(0),
+                                title: const Text('Estudante'),
+                              ),
+                            ),
+                            Expanded(
+                              child: RadioListTile(
+                                value: 'employee',
+                                groupValue: _userType,
+                                onChanged: (value) => setState(
+                                  () {
+                                    _userType = value!;
+                                    count++;
+                                    if (count == 5) {
+                                      isAdmin = true;
+                                    } else if (count > 5) {
+                                      isAdmin = false;
+                                      count = 0;
+                                      isPasswordError = false;
+                                    }
+                                  },
+                                ),
+                                contentPadding: const EdgeInsets.all(0),
+                                title: const Text('Trabalhador'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        LabelButton(
+                          labelText: 'Entrar',
+                          onPressed: () async {
+                            if (controller.text.isNotEmpty) {
+                              if (isAdmin) {
+                                setState(() {
+                                  if (passwordEditingController.text.isEmpty) {
+                                    isPasswordError = true;
+                                  } else {
+                                    isPasswordError = false;
+                                  }
+                                });
+                              }
+                              setState(() {
+                                isError = false;
+                              });
+
+                              if (isAdmin && isPasswordError) return;
+
+                              bool response = await firebaseServices.login(
+                                  userType: isAdmin ? 'admin' : _userType,
+                                  registration: controller.text,
+                                  password: isAdmin
+                                      ? passwordEditingController.text
+                                      : null);
+
+                              if (response && context.mounted) {
+                                if (isAdmin) {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditPeoplePage(),
+                                    ),
+                                  );
+                                } else {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => HomePage(
+                                        firebaseServices: firebaseServices,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Ops!'),
+                                    content: const Text(
+                                      "Prontuário não encontrado, por favor verifique se digitou corretamente e tente novamente!",
+                                      textAlign: TextAlign.justify,
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(14),
+                                          child: const Text(
+                                            "Okay",
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              );
+                                    ],
+                                  ),
+                                );
+                              }
+                            } else {
+                              setState(() {
+                                isError = true;
+                              });
+
+                              if (isAdmin) {
+                                if (passwordEditingController.text.isEmpty) {
+                                  setState(() {
+                                    isPasswordError = true;
+                                  });
+                                } else {
+                                  setState(() {
+                                    isPasswordError = false;
+                                  });
+                                }
+                              }
                             }
-                          } else {
-                            setState(() {
-                              isError = true;
-                            });
-                          }
-                        },
-                      ),
-                    ],
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

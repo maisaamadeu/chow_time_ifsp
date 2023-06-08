@@ -50,18 +50,21 @@ class FirebaseServices {
       required String registration,
       String? password}) async {
     try {
+      late QuerySnapshot querySnapshot;
       if (Firebase.apps.isEmpty) {
         await initFirebase();
       }
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('${userType}s')
-          .where('registration', isEqualTo: registration)
-          .get();
+
       if (userType == 'admin') {
         querySnapshot = await FirebaseFirestore.instance
             .collection('${userType}s')
             .where('registration', isEqualTo: registration)
             .where('password', isEqualTo: password)
+            .get();
+      } else {
+        querySnapshot = await FirebaseFirestore.instance
+            .collection('${userType}s')
+            .where('registration', isEqualTo: registration)
             .get();
       }
 
