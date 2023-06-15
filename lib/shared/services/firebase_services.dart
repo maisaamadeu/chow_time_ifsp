@@ -1,19 +1,22 @@
+//Importa as bibliotecas necessárias
 import 'dart:io';
-
 import 'package:chow_time_ifsp/firebase_options.dart';
 import 'package:chow_time_ifsp/shared/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+//Esta é a classe que será responsável por maioria das funções no aplicativo
 class FirebaseServices {
-  UserModel? user;
-  QuerySnapshot? allMenus;
-  QueryDocumentSnapshot? currentMenu;
+  UserModel? user; // Objeto UserModel que representa o usuário logado
+  QuerySnapshot? allMenus; // Snapshot contendo todos os menus
+  QueryDocumentSnapshot? currentMenu; // Snapshot do menu atual
 
+  //Inicializa o Firebase
   Future<void> initFirebase() async {
     try {
       WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +28,64 @@ class FirebaseServices {
     }
   }
 
+  //Verifica se está conectado a Internet
+  Future<bool> isInternalNetworkConnected() async {
+    try {
+      var connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.wifi ||
+          connectivityResult == ConnectivityResult.mobile) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Erro ao verificar a conectividade de rede: $e');
+      return false;
+    }
+  }
+
+  //Obtém o endereço IP do usuário
+  Future<String> getUserIPAddress() async {
+    try {
+      for (var interface in await NetworkInterface.list()) {
+        for (var address in interface.addresses) {
+          if (address.type == InternetAddressType.IPv4) {
+            if (!address.isLoopback) {
+              return address.address;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('Erro ao obter o endereço IP: $e');
+    }
+
+    return 'Endereço IP desconhecido';
+  }
+
+  //Verifica se o endereço IP é interno
+  Future<bool> isInternalIPAddress() async {
+    try {
+      bool resultConnection = await isInternalNetworkConnected();
+      if (!resultConnection) return false;
+
+      String ipAddress = await getUserIPAddress();
+      if (ipAddress.isEmpty || ipAddress == 'Endereço IP desconhecido') {
+        return false;
+      }
+
+      const networkPrefix = '10.107';
+
+      final ipOctets = ipAddress.split('.');
+      final ipNetwork = '${ipOctets[0]}.${ipOctets[1]}';
+
+      return ipNetwork == networkPrefix;
+    } catch (e) {
+      print('Erro ao verificar o endereço IP interno: $e');
+      return false;
+    }
+  }
+
+  //Obtém uma lista de pessoas do tipo escolhido, podendo ser tanto estudantes quanto servidores
   Future<List<QueryDocumentSnapshot>?> getPeople({required String type}) async {
     try {
       if (Firebase.apps.isEmpty) {
@@ -45,6 +106,7 @@ class FirebaseServices {
     return null;
   }
 
+  //Realiza o login do usuário
   Future<bool> login(
       {required String userType,
       required String registration,
@@ -84,6 +146,7 @@ class FirebaseServices {
     }
   }
 
+  //Obtém os menus
   Future<bool> getMenu({DateTime? customDate}) async {
     try {
       if (Firebase.apps.isEmpty) {
@@ -106,10 +169,8 @@ class FirebaseServices {
 
       if (allMenus != null) {
         if (weekDate > 5) {
-          startWeekTime =
-              startWeekTime.add(const Duration(days: 7)); //Não está adicionando
-          endWeekTime =
-              endWeekTime.add(const Duration(days: 7)); //Não está adicionado
+          startWeekTime = startWeekTime.add(const Duration(days: 7));
+          endWeekTime = endWeekTime.add(const Duration(days: 7));
           formattedStartWeekTime =
               DateFormat('dd/MM/yyyy').format(startWeekTime);
           formattedEndWeekTime = DateFormat('dd/MM/yyyy').format(endWeekTime);
@@ -138,6 +199,7 @@ class FirebaseServices {
     }
   }
 
+  //Edita o menu atual
   Future<void> editMenu({
     String? mainCourse,
     String? salad,
@@ -170,6 +232,7 @@ class FirebaseServices {
     }
   }
 
+  //Adiciona ou remove um estudante de um dia da semana
   Future<void> addOrRemoveStudent({
     required int index,
     required String registration,
@@ -207,6 +270,7 @@ class FirebaseServices {
     }
   }
 
+  //Adiciona uma semana com base na última disponível
   Future<void> addWeek() async {
     try {
       if (Firebase.apps.isEmpty) {
@@ -333,6 +397,7 @@ class FirebaseServices {
     }
   }
 
+  //Deleta os menus selecionados
   Future<void> deleteMenuItems(
       List<DocumentSnapshot<Object?>> deleteMenus) async {
     try {
@@ -352,6 +417,7 @@ class FirebaseServices {
     }
   }
 
+  //Deleta todos os documentos de uma coleção do firestore, podendo ser usuado para várias finalidades
   Future<void> deleteAllDocumentsInCollection(
       String collectionName, BuildContext context) async {
     try {
@@ -385,6 +451,7 @@ class FirebaseServices {
     }
   }
 
+  //Importa CSV de estudantes ou de servidores para o Firestore
   Future<void> importCSVToFirestore(
       String collectionName, BuildContext context) async {
     try {

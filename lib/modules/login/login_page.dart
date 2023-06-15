@@ -101,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                                 onChanged: (value) => setState(
                                   () {
                                     _userType = value!;
-                                    if (count > 10) {
+                                    if (count >= 5) {
                                       isAdmin = false;
                                       count = 0;
                                     }
@@ -165,7 +165,8 @@ class _LoginPageState extends State<LoginPage> {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const EditPeoplePage(),
+                                      builder: (context) =>
+                                          const EditPeoplePage(),
                                     ),
                                   );
                                 } else {
