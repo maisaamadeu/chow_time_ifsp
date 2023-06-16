@@ -13,16 +13,17 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   bool isError = false;
+  String ip = '';
 
   Future<void> checkNetworkAndNavigate() async {
-    bool isConnected = await FirebaseServices().isInternalIPAddress();
+    bool isConnected = await FirebaseServices().isConnectedToInternet();
 
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
 
     if (isConnected) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => LoginPage(),
+          builder: (context) => const LoginPage(),
         ),
       );
     } else {
@@ -43,7 +44,7 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -54,6 +55,7 @@ class _SplashPageState extends State<SplashPage> {
               const SizedBox(
                 height: 20,
               ),
+              Text(ip),
               isError
                   ? SizedBox(
                       width: 300,
@@ -67,7 +69,7 @@ class _SplashPageState extends State<SplashPage> {
                         textAlign: TextAlign.center,
                       ),
                     )
-                  : CircularProgressIndicator(),
+                  : const CircularProgressIndicator(),
             ],
           ),
         ),

@@ -44,6 +44,9 @@ dependencies:
   csv: ^5.0.2
   flutter_dialogs: ^3.0.0
   connectivity: ^3.0.6
+  get_ip_address: ^0.0.6
+  wifi_flutter: ^0.2.0
+  network_info_plus: ^4.0.1
 
 dev_dependencies:
   flutter_test:

@@ -28,59 +28,12 @@ class FirebaseServices {
     }
   }
 
-  //Verifica se está conectado a Internet
-  Future<bool> isInternalNetworkConnected() async {
-    try {
-      var connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.wifi ||
-          connectivityResult == ConnectivityResult.mobile) {
-        return true;
-      }
-      return false;
-    } catch (e) {
-      print('Erro ao verificar a conectividade de rede: $e');
-      return false;
-    }
-  }
-
-  //Obtém o endereço IP do usuário
-  Future<String> getUserIPAddress() async {
-    try {
-      for (var interface in await NetworkInterface.list()) {
-        for (var address in interface.addresses) {
-          if (address.type == InternetAddressType.IPv4) {
-            if (!address.isLoopback) {
-              return address.address;
-            }
-          }
-        }
-      }
-    } catch (e) {
-      print('Erro ao obter o endereço IP: $e');
-    }
-
-    return 'Endereço IP desconhecido';
-  }
-
-  //Verifica se o endereço IP é interno
-  Future<bool> isInternalIPAddress() async {
-    try {
-      bool resultConnection = await isInternalNetworkConnected();
-      if (!resultConnection) return false;
-
-      String ipAddress = await getUserIPAddress();
-      if (ipAddress.isEmpty || ipAddress == 'Endereço IP desconhecido') {
-        return false;
-      }
-
-      const networkPrefix = '10.107';
-
-      final ipOctets = ipAddress.split('.');
-      final ipNetwork = '${ipOctets[0]}.${ipOctets[1]}';
-
-      return ipNetwork == networkPrefix;
-    } catch (e) {
-      print('Erro ao verificar o endereço IP interno: $e');
+  Future<bool> isConnectedToInternet() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+      return true;
+    } else {
       return false;
     }
   }
