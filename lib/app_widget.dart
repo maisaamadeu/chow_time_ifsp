@@ -1,5 +1,6 @@
-import 'package:chow_time_ifsp/modules/splash/splash_page.dart';
 import 'package:flutter/material.dart';
+
+import 'modules/login/login_page.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
@@ -15,7 +16,7 @@ class AppWidget extends StatelessWidget {
           seedColor: Colors.green,
         ),
       ),
-      home: const SplashPage(),
+      home: const LoginPage(),
     );
   }
 }

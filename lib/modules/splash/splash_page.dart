@@ -18,8 +18,6 @@ class _SplashPageState extends State<SplashPage> {
   Future<void> checkNetworkAndNavigate() async {
     bool isConnected = await FirebaseServices().isConnectedToInternet();
 
-    await Future.delayed(const Duration(seconds: 2));
-
     if (isConnected) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
