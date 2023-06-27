@@ -1,0 +1,31 @@
+package_rename_config:
+  android:
+    app_name: Hora do Rango
+    package_name: com.ifsp.chowtime
+    override_old_package: com.ifsp.chowtime
+    lang: kotlin
+
+  ios:
+    app_name: Hora do Rango
+    bundle_name: horadorango
+    package_name: com.ifsp.chowtime
+
+  web:
+    app_name: Hora do Rango
+    description: Package to change project configurations.
+
+  linux:
+    app_name: Hora do Rango
+    package_name: com.ifsp.chowtime
+    exe_name: renamedemo-linux-x64
+
+  windows:
+    app_name: Hora do Rango
+    organization: IFSP
+    copyright_notice: Copyright ©️ 2022 IFSP. All rights reserved.
+    exe_name: renamedemo-win32
+
+  macos:
+    app_name: Hora do Rango
+    package_name: com.ifsp.chowtime
+    copyright_notice: Copyright ©️ 2022 IFSP. All rights reserved.

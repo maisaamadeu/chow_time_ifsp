@@ -185,7 +185,7 @@ class _ChowCardState extends State<ChowCard> {
                           child: Checkbox(
                             value: widget.containsStudent,
                             onChanged: (value) {
-                              if(hasPassedDate(widget.date)) {
+                              if (hasPassedDate(widget.date)) {
                                 showAlert(context);
                                 return;
                               }
@@ -200,7 +200,7 @@ class _ChowCardState extends State<ChowCard> {
               ? Container(
                   margin: const EdgeInsets.only(top: 10),
                   child: Text(
-                    'Produzido com amor pelos alunos de Redes 3 de 2023: Maísa, Hallisson e Gabriel ❤️❤️❤️',
+                    'Produzido com amor pelos alunos de Redes 3 de 2023: Maísa e Hallisson ❤️❤️❤️',
                     style: AppTextStyles.trailingRegular,
                   ),
                 )
